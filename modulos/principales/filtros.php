@@ -3,34 +3,31 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Filtros</title>
-<style type="text/css">
-</style>
+<link href="../css/estilos (2).css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
-  <div class="genero" id="selectores">
-    <table width="123" border="0">
+  <div class="genero">
+    <table width="100" border="0">
       <tr>
         <td width="70"><strong>GENERO</strong></td>
-        <td width="37"><span class="Estilo2">
-          <select name="sexo" class="required" id="genero">
-            <option></option>
-            <?php $cadbusca = "SELECT * FROM genero";
+        <td width="118"><select name="sexo" class="required" id="sexo">
+          <option></option>
+          <?php $cadbusca = "SELECT * FROM genero";
 				
 				$resultado = mysql_query($cadbusca,Conectar:: conexion());
 				
 				while ($row = mysql_fetch_array($resultado)){
 					
 			?>
-            <option value="<?php echo $row["Id_genero"];?>"><?php echo $row["Genero"];?></option>
-            <?php }?>
-          </select>
-        </span></td>
+          <option value="<?php echo $row["Id_genero"];?>"><?php echo $row["Genero"];?></option>
+          <?php }?>
+        </select></td>
       </tr>
       <tr>
         <td><strong>TALLA</strong></td>
         <td><span class="Estilo2">
-          <select name="sexo2" class="required" id="talla">
+          <select name="sexo2" class="required" id="sexo2">
             <option></option>
             <?php $cadbusca = "SELECT * FROM talla";
 				

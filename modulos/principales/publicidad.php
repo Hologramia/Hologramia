@@ -7,7 +7,7 @@
 	</head>
 
 	<body onload="publicidad()">
-		<div align="center"><a href="javascript:ponerpublicidad" target="_blank"><img src="" name="publicidad" width="156" height="184"></a>
+		<div align="center"><a href="javascript:ponerpublicidad" target="_blank"><img src="Imagens/socialmedia1.jpg" name="publicidad" width="156" height="184"></a>
     </div>
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>

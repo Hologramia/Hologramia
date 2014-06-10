@@ -6,10 +6,12 @@
 <title>Estilos</title>
 <script src="SpryAssets/SpryAccordion.js" type="text/javascript"></script>
 <link href="SpryAssets/SpryAccordion.css" rel="stylesheet" type="text/css" />
+<link href="../css/estilos (2).css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
-<div align="left">
+<div align="left" id="filtros">
+  <p><strong>TENDENCIAS</strong></p>
   <table width="60" border="0" cellpadding="2">
     <tr>
       <td width="88"><div id="Accordion1" class="Accordion" tabindex="0">

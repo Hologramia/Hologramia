@@ -8,6 +8,17 @@ body {
     scrollbar-darkshadow-color:#f3f3f3; 
     scrollbar-3dlight-color:#f3f3f3; 
 } 
+
+#filtros{
+  background-position:  center center;
+  background-repeat: no-repeat;
+  backgrouund color: #333;
+  height: 156px;
+  
+  margin-left:3px;
+  margin-top:3px;
+  margin-right:3px;
+  margin-bottom:3px;
 }
 
 #banner{
