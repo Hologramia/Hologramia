@@ -1,5 +1,15 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Documento sin título</title>
+<link href="../../css/estilos (2).css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
 <?php 
-$key_words    = 'verde pantalon rojo corbata azul corbata verde chaqueta morado pantalon';
+$key_words    = 'verde pantalon rojo corbata azul corbata verde chaqueta morado pantalon blusa franela franelilla zapatos camisa ';
  
 if(strlen($key_words)>1){//No realizamos búsqueda si la palabra es de un solo caracter
             if($key_words){
@@ -19,8 +29,9 @@ $sql = mysql_query("SELECT id_producto,nombre,precio,imagen,descripcion, MATCH (
 						}
 ?>
 
-<div align="center" id="filtros">
-  <table width="206" border="1">
+<div align="center">
+  <h1><strong>PRODUCTOS DESTACADOS</strong></h1>
+  <table width="100" border="0">
     <tr>
       <?php
 $contador = 1; 
@@ -32,30 +43,26 @@ echo "</tr><tr>";
 }
 ?>
       <td width="100"><div align="center">
-        <p align="center"><a href="index.php?prod=<?php echo $row['id_producto']; ?>"><img src="<?php echo $row['imagen'];?>" width="160" height="200" /></a></p>
+      <div>
+        <div align="left"><a href="https://www.facebook.com/"/a><img src="PNGs/Facebook.png" width="20" height="20" /><a href="https://www.twiter.com/"/a><img src="PNGs/Twitter-Bird.png" width="20" height="20" /><img src="PNGs/Google-Plus.png" width="20" height="20" /><img src="PNGs/Linkedin.png" width="20" height="20" /><img src="PNGs/Rss.png" width="20" height="20" /><img src="PNGs/Youtube.png" width="20" height="20" /></div>
+      </div>
+        <p align="right"><a href="index.php?prod=<?php echo $row['id_producto']; ?>"><img src="<?php echo $row['imagen'];?>" width="160" height="190" /></a></p>
         <div align="center">
-          <table width="100" border="0">
-            <tr>
-              <td width="61"><strong>Art&iacute;culo:</strong></td>
-              <td width="36"><?php echo $row['descripcion']; ?></td>
-              </tr>
-            <tr>
-              <td><strong>Precio:</strong></td>
-              <td><?php echo $row['precio']; ?></td>
-              </tr>
-          </table>
-          
-          <table width="100" border="0">
-            <tr>
-              <td><img src="Imagens/H.png" width="93" height="68" /></td>
-              </tr>
-          </table>
-        </div>
-      </div></td>
+           <div>
+             <div align="left" id=""><strong>Art&iacute;culo:  <?php echo $row['descripcion']; ?></strong></div>
+           </div>
+        <div>
+          <div align="left" id=""><strong>Precio:</strong>  <?php echo $row['precio']; ?></div>
+           <div align="center"><a href="javascript:alert('proximo a funcionar')"><img src="Imagens/H.png" width="50" height="75" border="0" /></a></div>
+          </div>
+                  
       <?php
 $contador++;
 }
 }
 ?>
+  
   </tr></table>
 </div>
+</body>
+</html>

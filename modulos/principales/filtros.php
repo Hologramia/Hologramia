@@ -10,8 +10,8 @@
   <div class="genero">
     <table width="100" border="0">
       <tr>
-        <td width="70"><strong>GENERO</strong></td>
-        <td width="118"><select name="sexo" class="required" id="sexo">
+        <td width="50"><strong>GENERO</strong></td>
+        <td width="25"><select name="sexo" class="required" id="sexo">
           <option></option>
           <?php $cadbusca = "SELECT * FROM genero";
 				
