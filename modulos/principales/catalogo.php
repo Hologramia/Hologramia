@@ -8,8 +8,7 @@
 </head>
 
 <body>
-<div align="center">
-  <?php 
+<?php 
 $key_words    = 'verde pantalon rojo corbata azul corbata verde chaqueta morado pantalon blusa franela franelilla zapatos camisa ';
  
 if(strlen($key_words)>1){//No realizamos búsqueda si la palabra es de un solo caracter
@@ -29,11 +28,10 @@ $sql = mysql_query("SELECT id_producto,nombre,precio,imagen,descripcion, MATCH (
 }
 						}
 ?>
-    
-</div>
-<h1 align="center"><strong>PRODUCTOS DESTACADOS</strong></h1>
+
 <div align="center">
-  <table width="100" border="1">
+  <h1><strong>PRODUCTOS DESTACADOS</strong></h1>
+  <table width="100" border="0">
     <tr>
       <?php
 $contador = 1; 
@@ -44,6 +42,7 @@ if ($contador > 6) {
 echo "</tr><tr>";
 }
 ?>
+<<<<<<< HEAD
       <td width="150"><div align="center">
         <div align="right"><div class="fb-like"data-href="http://hologramia.com/pagina.html"></div><a href="Clases/carrito.php" target="new"><img src="Imagens/carrito-de-compras.jpg" width="39" height="37" />
         </div>
@@ -60,11 +59,28 @@ echo "</tr><tr>";
         </div>
           
         <?php
+=======
+      <td width="100"><div align="center">
+      <div>
+        <div align="left"><a href="https://www.facebook.com/"/a><img src="PNGs/Facebook.png" width="20" height="20" /><a href="https://www.twiter.com/"/a><img src="PNGs/Twitter-Bird.png" width="20" height="20" /><img src="PNGs/Google-Plus.png" width="20" height="20" /><img src="PNGs/Linkedin.png" width="20" height="20" /><img src="PNGs/Rss.png" width="20" height="20" /><img src="PNGs/Youtube.png" width="20" height="20" /></div>
+      </div>
+        <p align="right"><a href="index.php?prod=<?php echo $row['id_producto']; ?>"><img src="<?php echo $row['imagen'];?>" width="160" height="190" /></a></p>
+        <div align="center">
+           <div>
+             <div align="left" id=""><strong>Art&iacute;culo:  <?php echo $row['descripcion']; ?></strong></div>
+           </div>
+        <div>
+          <div align="left" id=""><strong>Precio:</strong>  <?php echo $row['precio']; ?></div>
+           <div align="center"><a href="javascript:alert('proximo a funcionar')"><img src="Imagens/H.png" width="50" height="75" border="0" /></a></div>
+          </div>
+                  
+      <?php
+>>>>>>> parent of 31ad1ea... trabajando en botones sociales y carrito
 $contador++;
 }
 }
 ?>
-          
+  
   </tr></table>
 </div>
 </body>
