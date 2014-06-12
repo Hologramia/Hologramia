@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<?php include ("includes/barra.php");?>
+<?php //include ("includes/barra.php");?>
 
 
 <div id="contenedor_izquierda">
