@@ -1,15 +1,14 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//ES" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Documento sin t&iacute;tulo</title>
-
-
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>CATALOGO</title>
+<link href="css/estilos.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
+
 <?php 
-$key_words    = 'verde pantalon rojo corbata azul corbata verde chaqueta morado pantalon blusa franela franelilla zapatos camisa ';
+$key_words = 'verde pantalon rojo corbata azul corbata verde chaqueta morado pantalon blusa franela franelilla zapatos camisa ';
  
 if(strlen($key_words)>1){//No realizamos búsqueda si la palabra es de un solo caracter
             if($key_words){
@@ -24,64 +23,57 @@ $sql = mysql_query("SELECT id_producto,nombre,precio,imagen,descripcion FROM pro
 								   
                         }else{
 $sql = mysql_query("SELECT id_producto,nombre,precio,imagen,descripcion, MATCH ( nombre,precio,descripcion ) AGAINST ( '$key_words' ) AS Score FROM productos WHERE MATCH ( nombre,precio,descripcion ) AGAINST ( '$key_words' ) ORDER BY Score DESC LIMIT 50",Conectar::conexion()) or die("La consulta a nuestra base de datos es erronea.".mysql_error());
+  }
+ }
 }
-}
-						}
 ?>
 
 <div align="center">
   <h1><strong>PRODUCTOS DESTACADOS</strong></h1>
-  <table width="100" border="0">
-    <tr>
-      <?php
+
+<?php
 $contador = 1; 
 for ($x=1;$x<6; $x++){
 while ($row = mysql_fetch_array($sql))
 {
 if ($contador > 6) {
-echo "</tr><tr>";
+echo "<tr></tr>";
 }
 ?>
-<<<<<<< HEAD
-      <td width="150"><div align="center">
-        <div align="right"><div class="fb-like"data-href="http://hologramia.com/pagina.html"></div><a href="Clases/carrito.php" target="new"><img src="Imagens/carrito-de-compras.jpg" width="39" height="37" />
-        </div>
-        <div align="center"></div>
-        <div align="right" id="redes">
-        <div class="addthis_sharing_toolbox"></div></div>
-        <p align="left"><a href="index.php?prod=<?php echo $row['id_producto']; ?>"> <img src="<?php echo $row['imagen'];?>" width="160" height="200" /></a></p>
-        <div>
-          <div align="left" ><strong>Art&iacute;culo:  <?php echo $row['descripcion']; ?></strong></div>
-           </div>
-        <div>
-          <div align="left" ><strong>Precio:</strong>  <?php echo $row['precio']; ?></div>
-           <div align="center"><a href="javascript:alert('proximo a funcionar')"><img src="Imagens/activo.png" width="80" height="75" /></a></div>
-        </div>
-          
-        <?php
-=======
-      <td width="100"><div align="center">
-      <div>
-        <div align="left"><a href="https://www.facebook.com/"/a><img src="PNGs/Facebook.png" width="20" height="20" /><a href="https://www.twiter.com/"/a><img src="PNGs/Twitter-Bird.png" width="20" height="20" /><img src="PNGs/Google-Plus.png" width="20" height="20" /><img src="PNGs/Linkedin.png" width="20" height="20" /><img src="PNGs/Rss.png" width="20" height="20" /><img src="PNGs/Youtube.png" width="20" height="20" /></div>
-      </div>
-        <p align="right"><a href="index.php?prod=<?php echo $row['id_producto']; ?>"><img src="<?php echo $row['imagen'];?>" width="160" height="190" /></a></p>
-        <div align="center">
-           <div>
-             <div align="left" id=""><strong>Art&iacute;culo:  <?php echo $row['descripcion']; ?></strong></div>
-           </div>
-        <div>
-          <div align="left" id=""><strong>Precio:</strong>  <?php echo $row['precio']; ?></div>
-           <div align="center"><a href="javascript:alert('proximo a funcionar')"><img src="Imagens/H.png" width="50" height="75" border="0" /></a></div>
-          </div>
-                  
-      <?php
->>>>>>> parent of 31ad1ea... trabajando en botones sociales y carrito
+
+<div id="caja">
+  <div align="center">
+    <table width="203" border="0">
+      <tr>
+        <td width="198"><div align="left"><a href="index.php?prod=<?php echo $row['id_producto']; ?>"><img src="<?php echo $row['imagen'];?>" width="133" height="170" /></a><img src="Imagens/ecommerce.jpg" width="52" height="44" align="top" />
+            <div id="comprar"></div>
+            <table width="197" border="0">
+              <tr>
+                <td width="58"><strong>Art&iacute;culo:</strong></td>
+                <td width="129"><strong><?php echo $row['descripcion']; ?></strong></td>
+              </tr>
+              <tr>
+                <td colspan="2">&nbsp;</td>
+              </tr>
+              <tr>
+                <td><strong>Precio:</strong></td>
+                <td><?php echo $row['precio']; ?></td>
+              </tr>
+            </table>
+            <div align="center"><img src="Imagens/H2.png" width="100" height="100" /></div>
+            </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <p align="center"></p>
+</div>
+
+<?php
 $contador++;
 }
 }
-?>
-  
-  </tr></table>
-</div>
+?> 
+      
 </body>
 </html>

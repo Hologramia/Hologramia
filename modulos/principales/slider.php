@@ -1,7 +1,9 @@
-<html>
-    <head>
-          <title></title>
-        <style>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Selector_de_Precios</title>
+<style>
             .sliderDual label{ 
                 font-weight: bolder;    
             }
@@ -16,32 +18,37 @@
                 z-index:5;   
             }
         </style>
-    </head>
+</head>
 
-    <body class="yui3-skin-sam">
-       <div>
-              <div id="sliderDual" class="sliderDual">
-              <div id="sliderA"></div>
+<body class="yui3-skin-sam">
+<div id="slider">
+  <p><strong> Precios</strong></p>
+            <div id="sliderDual" class="sliderDual">
+                <div id="sliderA"></div>
                 <div id="sliderB"></div>
-                <div><label id="txtSliderA"></label> - <label id="txtSliderB"></label></div>     
+                <div><label id="txtSliderA"></label> 
+                  -
+                  
+                <label id="txtSliderB"></label></div>     
             </div>
        </div>
 
-<script src="http://yui.yahooapis.com/3.14.1/build/yui/yui-min.js"></script>
-
-
+<div align="center">
+  <script src="http://yui.yahooapis.com/3.14.1/build/yui/yui-min.js"></script>
+</div>
+</div>
 <script>
 YUI().use('slider', function (Y) {
 
     //Definimos los valor máximo y mínimo
-    var MAX = 200;
+    var MAX =200;
     var MIN = 50;
 
-    var MAJOR_STEP = 5;
-    var MINOR_STEP = 1;
+    var MAJOR_STEP = 20;
+    var MINOR_STEP = 5;
 
     var LENGTH = MAX - MIN;
-    var MIN_RANGE = 5;
+    var MIN_RANGE = 10;
 
     //Objeto de configuración de ambos sliders
     var config = {
@@ -87,3 +94,5 @@ YUI().use('slider', function (Y) {
 
 });
 </script>
+</body>
+</html>

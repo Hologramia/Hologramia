@@ -24,7 +24,7 @@ $sql = mysql_query("SELECT id_producto,nombre,precio,imagen,descripcion, MATCH (
   <table width="100%" border="0" cellpadding="2">
     <tr>
       <td bgcolor="#F3F3F3"><div align="center">
-        <h1><strong>LOS MAS DESTACADOS</strong></h1>
+        <h1><strong>Su Art&iacute;culo</strong></h1>
       </div></td>
     </tr>
   </table>
