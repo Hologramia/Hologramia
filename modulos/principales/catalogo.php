@@ -1,68 +1,79 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//ES" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Documento sin t√≠tulo</title>
-<link href="../../css/estilos (2).css" rel="stylesheet" type="text/css" />
-
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>CATALOGO</title>
+<link href="css/estilos.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
+
 <?php 
-$key_words    = 'verde pantalon rojo corbata azul corbata verde chaqueta morado pantalon blusa franela franelilla zapatos camisa ';
+$key_words = 'verde pantalon rojo corbata azul corbata verde chaqueta morado pantalon blusa franela franelilla zapatos camisa ';
  
-if(strlen($key_words)>1){//No realizamos b√∫squeda si la palabra es de un solo caracter
+if(strlen($key_words)>1){//No realizamos b˙squeda si la palabra es de un solo caracter
             if($key_words){
            
-                        //Contamos el numero de palabras que incluye la b√∫squeda.
+                        //Contamos el numero de palabras que incluye la b˙squeda.
                         $frac    = explode(' ',$key_words);
                         $no                  = count($frac);
                        
-                        //Si la b√∫squeda tiene una palabra utilizamos LIKE sino MATCH AGAINST.
+                        //Si la b˙squeda tiene una palabra utilizamos LIKE sino MATCH AGAINST.
                         if($no == 1){
 $sql = mysql_query("SELECT id_producto,nombre,precio,imagen,descripcion FROM productos WHERE nombre LIKE '%$key_words%' OR precio LIKE '%$key_words%' OR descripcion LIKE '%$key_words%'",Conectar::conexion()) or die("La consulta a nuestra base de datos es erronea.".mysql_error());
 								   
                         }else{
 $sql = mysql_query("SELECT id_producto,nombre,precio,imagen,descripcion, MATCH ( nombre,precio,descripcion ) AGAINST ( '$key_words' ) AS Score FROM productos WHERE MATCH ( nombre,precio,descripcion ) AGAINST ( '$key_words' ) ORDER BY Score DESC LIMIT 50",Conectar::conexion()) or die("La consulta a nuestra base de datos es erronea.".mysql_error());
+  }
+ }
 }
-}
-						}
 ?>
 
 <div align="center">
   <h1><strong>PRODUCTOS DESTACADOS</strong></h1>
-  <table width="100" border="0">
-    <tr>
-      <?php
+
+<?php
 $contador = 1; 
 for ($x=1;$x<6; $x++){
 while ($row = mysql_fetch_array($sql))
 {
 if ($contador > 6) {
-echo "</tr><tr>";
+echo "<tr></tr>";
 }
 ?>
-      <td width="100"><div align="center">
-      <div>
-        <div align="left"><a href="https://www.facebook.com/"/a><img src="PNGs/Facebook.png" width="20" height="20" /><a href="https://www.twiter.com/"/a><img src="PNGs/Twitter-Bird.png" width="20" height="20" /><img src="PNGs/Google-Plus.png" width="20" height="20" /><img src="PNGs/Linkedin.png" width="20" height="20" /><img src="PNGs/Rss.png" width="20" height="20" /><img src="PNGs/Youtube.png" width="20" height="20" /></div>
-      </div>
-        <p align="right"><a href="index.php?prod=<?php echo $row['id_producto']; ?>"><img src="<?php echo $row['imagen'];?>" width="160" height="190" /></a></p>
-        <div align="center">
-           <div>
-             <div align="left" id=""><strong>Art&iacute;culo:  <?php echo $row['descripcion']; ?></strong></div>
-           </div>
-        <div>
-          <div align="left" id=""><strong>Precio:</strong>  <?php echo $row['precio']; ?></div>
-           <div align="center"><a href="javascript:alert('proximo a funcionar')"><img src="Imagens/H.png" width="50" height="75" border="0" /></a></div>
-          </div>
-                  
-      <?php
+
+<div id="caja">
+  <div align="center">
+    <table width="203" border="0">
+      <tr>
+        <td width="198"><div align="left"><a href="index.php?prod=<?php echo $row['id_producto']; ?>"><img src="<?php echo $row['imagen'];?>" width="133" height="170" /></a><img src="Imagens/ecommerce.jpg" width="52" height="44" align="top" />
+            <div id="comprar"></div>
+            <table width="197" border="0">
+              <tr>
+                <td width="58"><strong>Art&iacute;culo:</strong></td>
+                <td width="129"><strong><?php echo $row['descripcion']; ?></strong></td>
+              </tr>
+              <tr>
+                <td colspan="2">&nbsp;</td>
+              </tr>
+              <tr>
+                <td><strong>Precio:</strong></td>
+                <td><?php echo $row['precio']; ?></td>
+              </tr>
+            </table>
+            <div align="center"><img src="Imagens/H2.png" width="100" height="100" /></div>
+            </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <p align="center"></p>
+</div>
+
+<?php
 $contador++;
 }
 }
-?>
-  
-  </tr></table>
-</div>
+?> 
+      
 </body>
 </html>

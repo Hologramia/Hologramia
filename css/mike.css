@@ -1,0 +1,197 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.logotipo {
+	margin-right: 13px;
+	margin-left: 9px;
+	width: 119px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.labarra{
+	border-bottom: solid 1px;
+}
+
+.chat {
+	display:none;
+	background-color:#FFF;
+	border:2px solid #222222;
+	font-size:14px;
+	line-height:1.3em;	
+	margin:10px auto;
+	padding:10px;
+	position:absolute;
+	left: -72%;
+	top: 106%;
+	text-align:center;
+	width:300px;
+	border-radius:10px;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	-moz-box-shadow:0 0 5px #888888;
+	-webkit-box-shadow:0 0 5px #888888;
+}
+
+.globo:hover .chat {
+	display: block;
+}
+
+.serv {
+	margin-top:2.5px;
+}
+
+.chat-arrow-border {
+	border-color: transparent transparent #222222 transparent;
+	border-style: solid;
+	border-width: 10px;
+	height: 0;
+	width: 0;
+	position: absolute;
+	top: -22px;
+	left: 30px;
+}
+
+.chat-arrow {
+	border-color: transparent transparent #fff transparent;
+	border-style: solid;
+	border-width: 10px;
+	height: 0;
+	width: 0;
+	position: absolute;
+	top: -19px;
+	left: 30px;
+}
+
+.prr {
+	margin: 0px 15px 0px 15px;	
+}
+
+.sn2{margin:0px 15px;}
+.sn{margin:15px 0px;}
+.miniatura {
+	
+	width:300px;
+}
+
+.miniaturas {
+	margin-top: 7px;
+	width: 35px;
+	height: 35px;
+}
+
+.redsocial {
+	vertical-align: text-bottom;
+	margin-left: auto;
+	margin-right: auto;
+	width: 35px;
+	height: 35px;	
+}
+
+/************MINIATURAS************/
+#carrit{background: no-repeat url(../img/lasimagenes.png) 3px 3px;}
+
+#bs{background: no-repeat url(../img/lasimagenes.png) -177px -34px;}
+
+#candado{background: no-repeat url(../img/lasimagenes.png) -141px -33px;}
+
+#envios{background: no-repeat url(../img/lasimagenes.png) -248px -33px;}
+
+#quince{background: no-repeat url(../img/lasimagenes.png) -213px -34px;}
+
+#soundcloud{background:no-repeat url(../img/lasimagenes.png) -88px -31px;}
+
+#franela{background:no-repeat url(../img/laropa.png) 0px -35px;}
+#franela:hover {background: no-repeat url(../img/laropa.png) 0px 1px;}
+
+#sweater{background:no-repeat url(../img/laropa.png) -36px -35px;}
+#sweater:hover{background:no-repeat url(../img/laropa.png) -36px 2px;}
+
+#franelilla{background:no-repeat url(../img/laropa.png) -73px -37px;}
+#franelilla:hover{background:no-repeat url(../img/laropa.png) -73px -1px;}
+
+#pantalon{background:no-repeat url(../img/laropa.png) -109px -35px;}
+#pantalon:hover{background:no-repeat url(../img/laropa.png) -109px 1px;}
+
+#bermuda{background:no-repeat url(../img/laropa.png) -146px -35px;}
+#bermuda:hover{background:no-repeat url(../img/laropa.png) -146px 1px;}
+
+#leggins{background:no-repeat url(../img/laropa.png) -182px -35px;}
+#leggins:hover{background:no-repeat url(../img/laropa.png) -182px 1px;}
+
+#boxer{background:no-repeat url(../img/laropa.png) -218px -35px;}
+#boxer:hover{background:no-repeat url(../img/laropa.png) -218px 1px;}
+
+#falda{background:no-repeat url(../img/laropa.png) -255px -35px;}
+#falda:hover{background:no-repeat url(../img/laropa.png) -255px 1px;}
+
+#vestido{background:no-repeat url(../img/laropa.png) -292px -35px;}
+#vestido:hover{background: no-repeat url(../img/laropa.png) -290.5px 1px;}
+
+#panty{background:no-repeat url(../img/laropa.png) -325px -35px;}
+#panty:hover{background:no-repeat url(../img/laropa.png) -325px 1px;}
+
+#bota{background:no-repeat url(../img/laropa.png) -361px -35px;}
+#bota:hover{background:no-repeat url(../img/laropa.png) -361px 1px;}
+
+#tacon{background:no-repeat url(../img/laropa.png) -400px -35px;}
+#tacon:hover{background:no-repeat url(../img/laropa.png) -400px 1px;}
+
+#zandalia{background:no-repeat url(../img/laropa.png) -435px -35px;}
+#zandalia:thhover{background:no-repeat url(../img/laropa.png) -435px 1px;}
+
+#zapato{background:no-repeat url(../img/laropa.png) -470px -35px;}
+#zapato:hover{background:no-repeat url(../img/laropa.png) -470px 1px;}
+
+#lente{background:no-repeat url(../img/laropa.png) -509px -35px;}
+#lente:hover{background:no-repeat url(../img/laropa.png) -509px 1px;}
+
+#sombrero{background:no-repeat url(../img/laropa.png) -547px -35px;}
+#sombrero:hover{background:no-repeat url(../img/laropa.png) -547px 1px;}
+
+#accesorio{background:no-repeat url(../img/laropa.png) -584px -35px;}
+#accesorio:hover{background:no-repeat url(../img/laropa.png) -584px 1px;}
+
+
+/************MINIATURAS************/
+
+/******CARRITO***********/
+.elcarro{margin:0px 15px;}
+.car{width:40px;}
+.carritopart{display:inline-block;}
+#carritonum {
+	margin-left: -4px;
+	margin-top: 13px;
+	vertical-align: top;
+	font-size: 16px;
+}
+/******CARRITO***********/
+
+#ropa{background:no-repeat url(../img/camisa.jpg);}
+
+.divisor {
+	background-color:#e5e5e5;
+	height:50px;
+	width:1px;
+	margin: 0px 0px 0px 0px;
+	overflow:hidden;
+}
+
+.labarra {
+	border-bottom:solid 1px;
+}
+
+.menu {
+	position: absolute;
+	left: 92%;
+	top: 63%;
+}
+
+.busquedas:focus {width:350px;}
+
+#busquedas {
+width: 200px;
+}
+/**************************RESPONSIVE***********************/
+
+	

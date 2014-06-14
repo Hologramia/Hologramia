@@ -1,10 +1,6 @@
-#image{
-  margin:100px 100px;
-}
-
-body {
+#cuerpo {
 	background-color: #f3f3f3 ;
-	scrollbar-arrow-color:#999; 
+	scrollbar-arrow-color:#f3f3f3; 
     scrollbar-track-color:#f3f3f3; 
     scrollbar-shadow-color:#f3f3f3; 
     scrollbar-face-color:#f3f3f3; 
@@ -12,47 +8,127 @@ body {
     scrollbar-darkshadow-color:#f3f3f3; 
     scrollbar-3dlight-color:#f3f3f3; 
 } 
+
+#banner {
+height:300px;
+width: 980px;
+padding: 15px;
+/*para Firefox*/
+-moz-border-radius: 15px 15px 15px 15px;
+/*para Safari y Chrome*/
+-webkit-border-radius: 15px 15px 15px 15px;
+/* para Opera */
+border-radius: 15px 15px 15px 15px;
+/* para IE */
+behavior:url(border.htc);
 }
 
-#banner{
-  background-position:  center center;
-  background-repeat: no-repeat;
-  height: 156px;
-  margin-left:3px;
- 
-  margin-right:3px;
-  margin-bottom:3px;
+#caja {
+height: 300px;
+width:200px;
+padding: 15px;
+/*para Firefox*/
+-moz-border-radius: 15px 15px 15px 15px;
+/*para Safari y Chrome*/
+-webkit-border-radius: 15px 15px 15px 15px;
+/* para Opera */
+border-radius: 15px 15px 15px 15px;
+/* para IE */
+behavior:url(border.htc);
 }
 
-#contenedor_principal{
-	position: absolute;
-	width: 74%;
-	height: 95%;
-	left: 13%;
-	top: 45px;
-	
+#selector {
+alignment-adjust: central;
+background-color: #ededed;
+height:130px;
+width:100px;
+padding: 15px;
+/*para Firefox*/
+-moz-border-radius: 15px 15px 15px 15px;
+/*para Safari y Chrome*/
+-webkit-border-radius: 15px 15px 15px 15px;
+/* para Opera */
+border-radius: 15px 15px 15px 15px;
+/* para IE */
+behavior:url(border.htc);
 }
 
-#contenedor_derecha{
-width:12.5%;
-position: fixed;
-right:1px; 
-border: 1px  #ededed;
-background-color: #FCC;
-top:45px;
-height: 50%;
+#slider {
+background-color: #ededed;
+height:130px;
+width:100px;
+padding: 15px;
+/*para Firefox*/
+-moz-border-radius: 15px 15px 15px 15px;
+/*para Safari y Chrome*/
+-webkit-border-radius: 15px 15px 15px 15px;
+/* para Opera */
+border-radius: 15px 15px 15px 15px;
+/* para IE */
+behavior:url(border.htc);
 }
 
+#tendencias {
+background-color: # 339;
+height:130px;
+width:100px;
+padding: 15px;
+/*para Firefox*/
+-moz-border-radius: 15px 15px 15px 15px;
+/*para Safari y Chrome*/
+-webkit-border-radius: 15px 15px 15px 15px;
+/* para Opera */
+border-radius: 15px 15px 15px 15px;
+/* para IE */
+behavior:url(border.htc);
+}
 
 #contenedor_izquierda{
+background-color: #ededed;
 width:12.6%;
 position: fixed;
 left:1px;
 border: 1px  #ededed;
-background-color: #066;
 top:45px;
 height:90%;
 }
+
+#contenedor_principal{
+	background-color: #000;	
+	position: fixed;
+	width: 74%;
+	height: 95%;
+	left: 13%;
+	top: 45px;
+}
+
+#contenedor_derecha{
+background-color: #ededed;
+width:12.5%;
+position: fixed;
+right:0px; 
+border:0px  #ededed;
+top:45px;
+height: 50%;
+}
+
+#carrito {
+background-color: #FFF;
+height:130px;
+width:100px;
+padding: 15px;
+/*para Firefox*/
+-moz-border-radius: 15px 15px 15px 15px;
+/*para Safari y Chrome*/
+-webkit-border-radius: 15px 15px 15px 15px;
+/* para Opera */
+border-radius: 15px 15px 15px 15px;
+/* para IE */
+behavior:url(border.htc);
+}
+
+
+
 
 
 

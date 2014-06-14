@@ -10,7 +10,7 @@
 		}
 		/*** Sticky Menu ***/
 		nav {
-		    background-color:#f4f4df;
+		    background-color:#e2e8e4;
 		    height: 45px;
 		    position: fixed;
 		    top: 0;
@@ -61,18 +61,8 @@ window.open(form.dest.options[myindex].value,"_top","");
 <body>
 <form name="form">
     <div>
-    <nav>
-        <table>
-            <tr>
-              <td width="14%"><img src="Imagens/Hologramia_Logo.png" width="450" height="130"></td>
-              <td width="4%">&nbsp;</td>
-              <td width="16%"><input type="search"></td>
-            <td width="23%"><input type="submit"></td>
-              <td width="25%"><select name="dest" size="1" onchange="surfto(this.form)"><option value="#">ingresar</option><option value="session.php">1</option><option value="opcion2.html">2</option><option>3</option></select></td>
-            <td width="18%">&nbsp;</td></tr>
-        </table>
-    </nav>
-</div>
+  <nav><img src="Imagens/Hologramia.png" width="176" height="46"></nav>
+  
 </form>
 </body>
 </html>
