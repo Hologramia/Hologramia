@@ -8,7 +8,7 @@ class DB{
 		}
 		
 		$con = mysql_connect("localhost","root","");
-		mysql_select_db("hologramia_scheme");
+		mysql_select_db("hologramia_schema");
 		
 		self::$connection = $con;
 		
@@ -26,6 +26,11 @@ class DB{
 		//JUSTO:
 		//Add product to database table
 		//Return the insertion id using this: http://www.php.net//manual/en/function.mysql-insert-id.php
+		 $result=mysql_query( "INSERT INTO product (name, description, price) VALUES ("."'".$name."'"." ,"."'".$description."'"." ,".$price.")" , DB::connection());
+		
+		$id=mysql_insert_id();
+		
+		return $id;
 	}
 	
 	public static function getProductById($id){
