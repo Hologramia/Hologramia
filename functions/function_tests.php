@@ -16,11 +16,10 @@ require_once('functions.php');
 //}
 
 
-echo DB::insertProduct("franela3","marca buena3","600");
+//echo DB::insertProduct("franela3","marca buena3","600");
+//print_r(DB::getProductById("12"));
 
 
-
-//echo $id;
 
 
 ?>

@@ -37,6 +37,12 @@ class DB{
 		//JUSTO:
 		//This function must read from the products table and return the product having
 		//this id. If the product is not found, then it returns NULL
+		
+		$result=mysql_query("SELECT * FROM product WHERE id=".$id.";", DB::connection());
+
+   return mysql_fetch_row($result);
+		
+		
 	}
 	
 	public static function insertUser($name,$identifier/*this is a string*/,$password){
