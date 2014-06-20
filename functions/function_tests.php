@@ -16,7 +16,9 @@ require_once('functions.php');
 //}
 
 
-insertProduct("franela2","marca buena2","600")
+echo DB::insertProduct("franela3","marca buena3","600");
+
+
 
 //echo $id;
 

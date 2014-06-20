@@ -28,9 +28,9 @@ class DB{
 		//Return the insertion id using this: http://www.php.net//manual/en/function.mysql-insert-id.php
 		 $result=mysql_query( "INSERT INTO product (name, description, price) VALUES ("."'".$name."'"." ,"."'".$description."'"." ,".$price.")" , DB::connection());
 		
-		$id=mysql_insert_id();
+		$product_id=mysql_insert_id();
 		
-		return $id;
+		return $product_id;
 	}
 	
 	public static function getProductById($id){
