@@ -16,25 +16,52 @@ class DB{
 	}
 	
 	//JUSTO:
-	//For every query that you do, please do:
+	//For every query that you do, please use the following syntax:
 	//mysql_query( $yourQuery , DB::connection());
 	//Don't worry, this doesn't mean the connection is performed again and again
 	// every time.
 	//If you read the function above, you will see it is not performed every time.
-	
-	public static function getProductById($id){
-		//JUSTO:
-		//This function must read from the products table and return the product with
-		//this id. If it is not found, then it returns NULL
-	}
 	
 	public static function insertProduct($name,$description,$price){
 		//JUSTO:
 		//Add product to database table
 		//Return the insertion id using this: http://www.php.net//manual/en/function.mysql-insert-id.php
 	}
+	
+	public static function getProductById($id){
+		//JUSTO:
+		//This function must read from the products table and return the product having
+		//this id. If the product is not found, then it returns NULL
+	}
+	
+	public static function insertUser($name,$identifier/*this is a string*/,$password){
+		//JUSTO: Insert user, return the insert id as in insertProduct();
+	}
+	
+	public static function getUserById($id){
+		
+	}
+	
+	public static function insertCategoryType($name,$allows_multiple){
+		//JUSTO: A "category type" is something like "Color, Size, Gender"
+		//This is NOT the same as a "category", which would be something like "Red, 15, Male"
+		//Do not edit this function unless this is clear.
+		
+		//This function inserts into the table catype.
+		
+		//$allows_multiple is a boolean (true or false).
+		//In MySQL this is a TINYINT(1) (1 or 0). This means whether a product is allowed
+		//to have multiple categories in this category type. For example: A product cannot have
+		//multiple "Size" (talla), but it can have multiple "Color".
+	}
+	
+	public static function getCategoryTypeById($id){
+		
+	}
+	
+	
 
-
+	
 
 
 	
