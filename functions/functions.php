@@ -47,6 +47,13 @@ class DB{
 	
 	public static function insertUser($name,$identifier/*this is a string*/,$password){
 		//JUSTO: Insert user, return the insert id as in insertProduct();
+		
+		 $result=mysql_query( "INSERT INTO user (name, identifier, password) VALUES ("."'".$name."'"." ,"."'".$identifier."'"." ,"."'".$password."'".")" , DB::connection());
+		
+		$user_id=mysql_insert_id();
+		
+		return $user_id;
+		
 	}
 	
 	public static function getUserById($id){
