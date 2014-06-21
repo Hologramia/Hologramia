@@ -241,6 +241,11 @@ class DB{
 	public static function removeProductWithId($id){
 		//This should also remove all entries in product_has_category with this product_id
 		
+		$i=0;
+		$everythig_deleted=FALSE;
+		while($everythig_deleted==FALSE){ 
+		$i=$i+1;
+		
 		if ($stmt = self::connection()->prepare("SELECT * FROM product WHERE id = ?")) {
     $stmt->bind_param("i",$id);
     $stmt->execute();
@@ -250,7 +255,7 @@ class DB{
 	}
 		
 		if($product_id==NULL){
-			return FALSE;
+			$everythig_deleted=TRUE;
 		}
 		else{
 		if ($stmt = self::connection()->prepare("DELETE FROM product WHERE id = ?"))
@@ -259,9 +264,23 @@ class DB{
     $stmt->execute();
     $stmt->close();
    }
-   return TRUE;	
+   if ($stmt = self::connection()->prepare("DELETE FROM product_has_category WHERE product_id = ?"))
+  {
+   $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->close();
+   }
+   
 	}
+		}
 	
+	
+	  if ($i==1){
+		 return FALSE;
+	 }
+	 else{
+		 return TRUE;
+	 }
 	
 	}
 	
@@ -295,6 +314,10 @@ class DB{
 	
 	public static function removeCategoryWithId($id){
 		//This should also remove all entries in product_has_category with those category_id
+		$i=0;
+		$everythig_deleted=FALSE;
+		while($everythig_deleted==FALSE){ 
+		$i=$i+1;
 		
 		if ($stmt = self::connection()->prepare("SELECT * FROM category WHERE id = ?"))    {
     $stmt->bind_param("i",$id);
@@ -305,19 +328,37 @@ class DB{
 	}
 		
 		if($category_id==NULL){
-			return FALSE;
+			$everythig_deleted=TRUE;
 		}
 		else{
+			
 		if ($stmt = self::connection()->prepare("DELETE FROM category WHERE id = ?"))
   {
-   $stmt->bind_param("i",$category_id);
+   $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->close();
+		
+   }
+   
+   if ($stmt = self::connection()->prepare("DELETE FROM product_has_category WHERE category_id = ?"))
+  {
+   $stmt->bind_param("i",$id);
     $stmt->execute();
     $stmt->close();
    }
-   return TRUE;	
+   
+   
+   }
+   
+   
 	}
 		
-		
+     if ($i==1){
+		 return FALSE;
+	 }
+	 else{
+		 return TRUE;
+	 }
 		
 	}
 	
