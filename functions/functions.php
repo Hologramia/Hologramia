@@ -258,15 +258,39 @@ class DB{
    $stmt->bind_param("i",$id);
     $stmt->execute();
     $stmt->close();
-   }	
+   }
+   return TRUE;	
 	}
-	return TRUE;
+	
+	
 	}
 	
 
 	
 	
 	public static function removeUserWithId($id){
+		
+		if ($stmt = self::connection()->prepare("SELECT * FROM user WHERE id = ?"))    {
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->bind_result($user_id,$name,$identifier,$password);
+    $stmt->fetch();
+    $stmt->close();
+	}
+		
+		if($user_id==NULL){
+			return FALSE;
+		}
+		else{
+		if ($stmt = self::connection()->prepare("DELETE FROM user WHERE id = ?"))
+  {
+   $stmt->bind_param("i",$user_id);
+    $stmt->execute();
+    $stmt->close();
+   }
+   return TRUE;	
+	}
+		
 	}
 	
 	public static function removeCategoryWithId($id){

@@ -36,7 +36,9 @@ require_once('functions.php');
 
 //echo DB::addCategoryToProduct("10","10");
 
-echo DB::removeProductWithId("30");
+//echo DB::removeProductWithId("30");
+
+echo DB::removeUserWithId("6");
 
 
 
