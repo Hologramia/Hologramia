@@ -177,6 +177,24 @@ class DB{
 	}
 	
 	public static function getCategoryById($id){
+		
+		  if ($stmt = self::connection()->prepare("SELECT * FROM category WHERE id = ?")) {
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->bind_result($id, $name, $catype_id);
+    $stmt->fetch();
+    $stmt->close();
+	if($id==NULL){
+	return NULL;
+	}
+    else{
+    return array($id, $name, $catype_id);
+	}
+	
+    }else{
+    return NULL;
+    }
+		
 	}
 	
 	public static function addCategoryToProduct($product_id,$category_id){

@@ -26,10 +26,13 @@ require_once('functions.php');
 
 //echo DB::insertCategoryType("Tallaii","0");
 
-print_r(DB::getCategoryTypeById("57"));
+//print_r(DB::getCategoryTypeById("57"));
 
 
+//echo DB::insertCategory("rojo","1");
 
+
+print_r(DB::getCategoryById("2"));
 
 
 
