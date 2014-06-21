@@ -75,6 +75,13 @@ class DB{
 		//In MySQL this is a TINYINT(1) (1 or 0). This means whether a product is allowed
 		//to have multiple categories in this category type. For example: A product cannot have
 		//multiple "Size" (talla), but it can have multiple "Color".
+		
+		
+		 $result=mysql_query( "INSERT INTO catype (name, allows_multiple) VALUES ("."'".$name."'"." ,".$allows_multiple." )" , DB::connection());
+	    $catype_id=mysql_insert_id();
+		
+		return $catype_id;
+		 
 	}
 	
 	public static function getCategoryTypeById($id){

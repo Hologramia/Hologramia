@@ -21,7 +21,10 @@ require_once('functions.php');
 
 //DB::insertUser("Juan Pepe2","justojavier@gmail.com2","123804702")
 
-print_r(DB::getUserById("3"));
+//print_r(DB::getUserById("3"));
+
+
+DB::insertCategoryType("Talla","0");
 
 
 ?>
