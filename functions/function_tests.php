@@ -34,7 +34,9 @@ require_once('functions.php');
 
 //print_r(DB::getCategoryById("2"));
 
-echo DB::addCategoryToProduct("10","10");
+//echo DB::addCategoryToProduct("10","10");
+
+echo DB::removeProductWithId("30");
 
 
 

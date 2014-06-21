@@ -240,7 +240,31 @@ class DB{
 		
 	public static function removeProductWithId($id){
 		//This should also remove all entries in product_has_category with this product_id
+		
+		if ($stmt = self::connection()->prepare("SELECT * FROM product WHERE id = ?")) {
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->bind_result($product_id,$name,$description,$price);
+    $stmt->fetch();
+    $stmt->close();
 	}
+		
+		if($product_id==NULL){
+			return FALSE;
+		}
+		else{
+		if ($stmt = self::connection()->prepare("DELETE FROM product WHERE id = ?"))
+  {
+   $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->close();
+   }	
+	}
+	return TRUE;
+	}
+	
+
+	
 	
 	public static function removeUserWithId($id){
 	}
