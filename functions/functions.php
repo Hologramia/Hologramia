@@ -32,7 +32,7 @@ class DB{
 		//Return the insertion id using this: http://www.php.net//manual/en/function.mysql-insert-id.php
 		 
 		 if ($stmt = self::connection()->prepare("INSERT INTO product (name, description, price) VALUES (?, ?, ?)")) {
-	$stmt->bind_param("ssd",$name, $description, $price);
+	$stmt->bind_param("sss",$name, $description, $price);
 	$stmt->execute();
 	$stmt->close();	
 	
@@ -160,6 +160,36 @@ class DB{
     return NULL;
     }
 		
+	}
+	
+	public static function insertCategory($name,$catype_id/*This has to be the id of an existing catype. Not sure what happens if it is not!!!*/){
+	}
+	
+	public static function getCategoryById($id){
+	}
+	
+	public static function addCategoryToProduct($product_id,$category_id){
+		//In case this is not clear yet: category_id is the id of a
+		//category, not of a catype. Make sure you understand the difference
+		//between these two.
+		
+		//HOW TO MAKE THIS FUNCTION: Insert these values into the table product_has_category
+	}
+		
+	public static function removeProductWithId($id){
+		//This should also remove all entries in product_has_category with this product_id
+	}
+	
+	public static function removeUserWithId($id){
+	}
+	
+	public static function removeCategoryWithId($id){
+		//This should also remove all entries in product_has_category with those category_id
+	}
+	
+	public static function removeCatypeWithId($id){
+		//This should also remove all categories with this catype_id
+		//And subsequently, all entries in product_has_category with those category_id
 	}
 	
 	
