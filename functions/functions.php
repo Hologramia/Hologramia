@@ -30,7 +30,12 @@ class DB{
 		//JUSTO:
 		//Add product to database table
 		//Return the insertion id using this: http://www.php.net//manual/en/function.mysql-insert-id.php
-		 $result=mysql_query( "INSERT INTO product (name, description, price) VALUES ("."'".$name."'"." ,"."'".$description."'"." ,".$price.")" , DB::connection());
+		 
+		 if ($stmt = self::connection()->prepare("INSERT INTO catype (name, description, price) VALUES (? ,?, ?)")) {
+	$stmt->bind_param("ssd",$name, $description, $price);
+	$stmt->execute();
+	$stmt->close();	
+	}
 		
 		$product_id=mysql_insert_id();
 		
@@ -42,9 +47,26 @@ class DB{
 		//This function must read from the products table and return the product having
 		//this id. If the product is not found, then it returns NULL
 		
-		$result=mysql_query("SELECT * FROM product WHERE id=".$id.";", DB::connection());
+		//$result=mysql_query("SELECT * FROM product WHERE id=".$id.";", DB::connection());
 
-   return mysql_fetch_row($result);
+   //return mysql_fetch_row($result);
+   
+     if ($stmt = self::connection()->prepare("SELECT * FROM product WHERE id = ?")) {
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->bind_result($id,$name,$description,$price);
+    $stmt->fetch();
+    $stmt->close();
+	if($id==NULL){
+	return NULL;
+	}
+    else{
+    return array($id,$name,$description,$price);
+	}
+	
+    }else{
+    return NULL;
+    }
 		
 		
 	}
@@ -53,6 +75,13 @@ class DB{
 		//JUSTO: Insert user, return the insert id as in insertProduct();
 		
 		 $result=mysql_query( "INSERT INTO user (name, identifier, password) VALUES ("."'".$name."'"." ,"."'".$identifier."'"." ,"."'".$password."'".")" , DB::connection());
+		 
+		  if ($stmt = self::connection()->prepare("INSERT INTO catype (name, identifier, password) VALUES (? ,?, ?)")) {
+	$stmt->bind_param("ssd", $name, $identifier, $password);
+	$stmt->execute();
+	$stmt->close();	
+	}
+		 	 
 		
 		$user_id=mysql_insert_id();
 		
@@ -61,10 +90,25 @@ class DB{
 	}
 	
 	public static function getUserById($id){
-		
-		$result=mysql_query("SELECT * FROM user WHERE id=".$id.";", DB::connection());
 
-   return mysql_fetch_row($result);
+
+    if ($stmt = self::connection()->prepare("SELECT * FROM user WHERE id = ?")) {
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->bind_result($id,$identifier,$password);
+    $stmt->fetch();
+    $stmt->close();
+	if($id==NULL){
+	return NULL;
+	}
+    else{
+    return array($id,$identifier,$password);
+	}
+	
+    }else{
+    return NULL;
+    }
+
 		
 	}
 	
@@ -79,37 +123,38 @@ class DB{
 		//In MySQL this is a TINYINT(1) (1 or 0). This means whether a product is allowed
 		//to have multiple categories in this category type. For example: A product cannot have
 		//multiple "Size" (talla), but it can have multiple "Color".
+	    
 		
 		
-		 $result=mysql_query( "INSERT INTO catype (name, allows_multiple) VALUES ("."'".$name."'"." ,".$allows_multiple." )" , DB::connection());
-	    $catype_id=mysql_insert_id();
+		if ($stmt = self::connection()->prepare("INSERT INTO catype (name, allows_multiple) VALUES (? ,?)")) {
+	$stmt->bind_param("si",$name,$allows_multiple);
+	$stmt->execute();
+	$stmt->close();	
+	}
+		$catype_id=mysql_insert_id();
 		
 		return $catype_id;
 		 
 	}
 	
 	public static function getCategoryTypeById($id){
-		
-		//$result=mysql_query("SELECT * FROM catype WHERE id=".$id.";", DB::connection());
 
-   //return mysql_fetch_row($result);
-
-   if ($stmt = self::connection()->prepare("SELECT * FROM catype WHERE id=".$id.";")) {
+   if ($stmt = self::connection()->prepare("SELECT * FROM catype WHERE id = ?")) {
     $stmt->bind_param("i",$id);
     $stmt->execute();
-    $stmt->bind_result($result);
+    $stmt->bind_result($id,$name,$allows_multiple);
     $stmt->fetch();
     $stmt->close();
-
-    return $result;
-}else{
+	if($id==NULL){
+	return NULL;
+	}
+    else{
+    return array($id,$name,$allows_multiple);
+	}
+	
+    }else{
     return NULL;
-}
-   
-   
-   
-   
-   
+    }
 		
 	}
 	
