@@ -347,9 +347,7 @@ class DB{
     $stmt->close();
    }
    
-   
    }
-   
    
 	}
 		
@@ -365,6 +363,67 @@ class DB{
 	public static function removeCatypeWithId($id){
 		//This should also remove all categories with this catype_id
 		//And subsequently, all entries in product_has_category with those category_id
+		
+		$i=0;
+		$everythig_deleted=FALSE;
+		while($everythig_deleted==FALSE){ 
+		$i=$i+1;
+		
+		if ($stmt = self::connection()->prepare("SELECT * FROM catype WHERE id = ?"))    {
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->bind_result($catype_id, $name, $allows_multiple);
+    $stmt->fetch();
+    $stmt->close();
+	}
+	
+	
+	
+	
+		
+		if($catype_id==NULL){
+			$everythig_deleted=TRUE;
+		}
+		else{
+			
+			if ($stmt = self::connection()->prepare("DELETE FROM catype WHERE id = ?"))
+  {
+   $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->close();
+		
+   }
+			
+			
+			if ($stmt = self::connection()->prepare("SELECT * FROM category WHERE catype_id = ?")) {
+    $stmt->bind_param("i",$catype_id);
+    $stmt->execute();
+    $stmt->bind_result($category_id, $name, $catype_id);
+	$k=0;
+    while ($stmt->fetch()) {
+		$cat_id[$k]=strval($category_id);
+		$k=$k+1;
+    }
+    $stmt->close();
+	}
+	
+	for($kk=0;$kk<$k;$kk=$kk+1){
+	 DB::removeCategoryWithId($cat_id[$kk]);
+	}
+			
+   }
+   
+   
+	}
+		
+     if ($i==1){
+		 return FALSE;
+	 }
+	 else{
+		 return TRUE;
+	 }
+	 
+		
 	}
 	
 	

@@ -36,11 +36,15 @@ require_once('functions.php');
 
 //echo DB::addCategoryToProduct("10","10");
 
-echo DB::removeProductWithId("5");
+//echo DB::removeProductWithId("5");
 
 //echo DB::removeUserWithId("6");
 
 //echo DB::removeCategoryWithId("5");
+
+echo DB::removeCatypeWithId("1");
+
+//DB::removeCategoryWithId("6")
 
 
 
