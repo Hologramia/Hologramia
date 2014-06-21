@@ -58,6 +58,10 @@ class DB{
 	
 	public static function getUserById($id){
 		
+		$result=mysql_query("SELECT * FROM user WHERE id=".$id.";", DB::connection());
+
+   return mysql_fetch_row($result);
+		
 	}
 	
 	public static function insertCategoryType($name,$allows_multiple){

@@ -19,7 +19,9 @@ require_once('functions.php');
 //echo DB::insertProduct("franela3","marca buena3","600");
 //print_r(DB::getProductById("12"));
 
-DB::insertUser("Juan Pepe2","justojavier@gmail.com2","123804702")
+//DB::insertUser("Juan Pepe2","justojavier@gmail.com2","123804702")
+
+print_r(DB::getUserById("3"));
 
 
 ?>
