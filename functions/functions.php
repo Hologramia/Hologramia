@@ -86,6 +86,10 @@ class DB{
 	
 	public static function getCategoryTypeById($id){
 		
+		$result=mysql_query("SELECT * FROM catype WHERE id=".$id.";", DB::connection());
+
+   return mysql_fetch_row($result);
+		
 	}
 	
 	

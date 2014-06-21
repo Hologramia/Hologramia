@@ -24,7 +24,9 @@ require_once('functions.php');
 //print_r(DB::getUserById("3"));
 
 
-DB::insertCategoryType("Talla","0");
+//DB::insertCategoryType("Talla","0");
+
+print_r(DB::getCategoryTypeById("3"));
 
 
 ?>
