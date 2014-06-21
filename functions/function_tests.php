@@ -32,7 +32,9 @@ require_once('functions.php');
 //echo DB::insertCategory("rojo","1");
 
 
-print_r(DB::getCategoryById("2"));
+//print_r(DB::getCategoryById("2"));
+
+echo DB::addCategoryToProduct("10","10");
 
 
 

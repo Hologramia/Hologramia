@@ -203,6 +203,39 @@ class DB{
 		//between these two.
 		
 		//HOW TO MAKE THIS FUNCTION: Insert these values into the table product_has_category
+		
+		if ($stmt = self::connection()->prepare("INSERT INTO product_has_category (product_id, category_id) VALUES (? ,?)")) {
+	$stmt->bind_param("ii", $product_id, $category_id);
+	$stmt->execute();
+	$stmt->close();	
+	}
+	
+	if ($stmt = self::connection()->prepare("SELECT * FROM product WHERE id = ?"))    {
+    $stmt->bind_param("i",$product_id);
+    $stmt->execute();
+    $stmt->bind_result($product_id,$name,$description,$price);
+    $stmt->fetch();
+    $stmt->close();
+	
+	}
+	
+	if ($stmt = self::connection()->prepare("SELECT * FROM category WHERE id = ?"))    {
+    $stmt->bind_param("i",$category_id);
+    $stmt->execute();
+    $stmt->bind_result($category_id, $name, $catype_id);
+    $stmt->fetch();
+    $stmt->close();
+	}
+	
+	if($product_id==NULL OR $category_id==NULL){
+	return FALSE;
+	} else{
+    return TRUE;
+    }
+	
+		//$product_has_category_id=mysqli_insert_id(self::connection());
+		//return $product_has_category_id;
+		
 	}
 		
 	public static function removeProductWithId($id){
