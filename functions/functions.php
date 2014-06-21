@@ -295,6 +295,30 @@ class DB{
 	
 	public static function removeCategoryWithId($id){
 		//This should also remove all entries in product_has_category with those category_id
+		
+		if ($stmt = self::connection()->prepare("SELECT * FROM category WHERE id = ?"))    {
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->bind_result($category_id, $name, $catype_id);
+    $stmt->fetch();
+    $stmt->close();
+	}
+		
+		if($category_id==NULL){
+			return FALSE;
+		}
+		else{
+		if ($stmt = self::connection()->prepare("DELETE FROM category WHERE id = ?"))
+  {
+   $stmt->bind_param("i",$category_id);
+    $stmt->execute();
+    $stmt->close();
+   }
+   return TRUE;	
+	}
+		
+		
+		
 	}
 	
 	public static function removeCatypeWithId($id){

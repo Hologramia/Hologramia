@@ -38,7 +38,9 @@ require_once('functions.php');
 
 //echo DB::removeProductWithId("30");
 
-echo DB::removeUserWithId("6");
+//echo DB::removeUserWithId("6");
+
+echo DB::removeCategoryWithId("7");
 
 
 
