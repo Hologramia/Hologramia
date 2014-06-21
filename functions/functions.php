@@ -81,7 +81,7 @@ class DB{
 		 //$result=mysql_query( "INSERT INTO user (name, identifier, password) VALUES ("."'".$name."'"." ,"."'".$identifier."'"." ,"."'".$password."'".")" , DB::connection());
 		 
 		  if ($stmt = self::connection()->prepare("INSERT INTO user (name, identifier, password) VALUES (? ,?, ?)")) {
-	$stmt->bind_param("ssd", $name, $identifier, $password);
+	$stmt->bind_param("sss", $name, $identifier, $password);
 	$stmt->execute();
 	$stmt->close();	
 	}
