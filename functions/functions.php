@@ -327,7 +327,9 @@ class DB{
 	}
 	
 	
-
+	public static function getCategoryIdsForProduct($category_id){
+		//Fetch all categories of a product. use product_has_category
+	}
 	
 
 
