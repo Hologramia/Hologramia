@@ -26,7 +26,11 @@ require_once('functions.php');
 
 //DB::insertCategoryType("Talla","0");
 
-print_r(DB::getCategoryTypeById("3"));
+print_r(DB::getCategoryTypeById("1"));
+
+
+
+
 
 
 ?>

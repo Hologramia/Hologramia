@@ -7,15 +7,12 @@ class DB{
 			return self::$connection;
 		}
 		
-		$con = new mysqli("localhost", "root", "", "hologramia_schema");
-		if ($con->connect_errno) {
-    		echo "Failed to connect to MySQL: (" . $con->connect_errno . ") " . $con->connect_error;
-    		self::$connection = NULL;
-    		return self::$connection;
-		}
+		$con = mysql_connect("localhost","root","");
+		mysql_select_db("hologramia_schema");
 		
 		self::$connection = $con;
-		return self::$connection;
+		
+		return $con;
 	}
 	
 	//JUSTO:
@@ -89,9 +86,26 @@ class DB{
 	
 	public static function getCategoryTypeById($id){
 		
-		$result=mysql_query("SELECT * FROM catype WHERE id=".$id.";", DB::connection());
+		//$result=mysql_query("SELECT * FROM catype WHERE id=".$id.";", DB::connection());
 
-   return mysql_fetch_row($result);
+   //return mysql_fetch_row($result);
+
+   if ($stmt = self::connection()->prepare("SELECT * FROM catype WHERE id=".$id.";")) {
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $stmt->bind_result($result);
+    $stmt->fetch();
+    $stmt->close();
+
+    return $result;
+}else{
+    return NULL;
+}
+   
+   
+   
+   
+   
 		
 	}
 	
