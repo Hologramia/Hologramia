@@ -163,6 +163,17 @@ class DB{
 	}
 	
 	public static function insertCategory($name,$catype_id/*This has to be the id of an existing catype. Not sure what happens if it is not!!!*/){
+		
+	if ($stmt = self::connection()->prepare("INSERT INTO category (name, catype_id) VALUES (? ,?)")) {
+	$stmt->bind_param("si", $name, $catype_id);
+	$stmt->execute();
+	$stmt->close();	
+	}
+	
+		$category_id=mysqli_insert_id(self::connection());
+		
+		return $category_id;
+		
 	}
 	
 	public static function getCategoryById($id){
