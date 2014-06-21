@@ -32,7 +32,7 @@ class DB{
 		//Return the insertion id using this: http://www.php.net//manual/en/function.mysql-insert-id.php
 		 
 		 if ($stmt = self::connection()->prepare("INSERT INTO product (name, description, price) VALUES (?, ?, ?)")) {
-	$stmt->bind_param("sss",$name, $description, $price);
+	$stmt->bind_param("ssd",$name, $description, $price);
 	$stmt->execute();
 	$stmt->close();	
 	
