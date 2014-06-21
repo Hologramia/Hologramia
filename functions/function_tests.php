@@ -16,17 +16,17 @@ require_once('functions.php');
 //}
 
 
-//echo DB::insertProduct("franela3","marca buena3","600");
-//print_r(DB::getProductById("12"));
+//echo DB::insertProduct("franelai","marca buenai","700");
+//print_r(DB::getProductById("30"));
 
-//DB::insertUser("Juan Pepe2","justojavier@gmail.com2","123804702")
+//echo DB::insertUser("Juan Pepei","justojavier@gmail.co2i","123804702i")
 
-//print_r(DB::getUserById("3"));
+//print_r(DB::getUserById("36"));
 
 
-DB::insertCategoryType("Talla","0");
+//echo DB::insertCategoryType("Tallaii","0");
 
-//print_r(DB::getCategoryTypeById("5"));
+print_r(DB::getCategoryTypeById("57"));
 
 
 

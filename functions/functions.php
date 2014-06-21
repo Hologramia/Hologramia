@@ -31,15 +31,19 @@ class DB{
 		//Add product to database table
 		//Return the insertion id using this: http://www.php.net//manual/en/function.mysql-insert-id.php
 		 
-		 if ($stmt = self::connection()->prepare("INSERT INTO catype (name, description, price) VALUES (? ,?, ?)")) {
+		 if ($stmt = self::connection()->prepare("INSERT INTO product (name, description, price) VALUES (?, ?, ?)")) {
 	$stmt->bind_param("ssd",$name, $description, $price);
 	$stmt->execute();
 	$stmt->close();	
+	
+	
 	}
-		
-		$product_id=mysql_insert_id();
+	
+	$product_id=mysqli_insert_id(self::connection());
 		
 		return $product_id;
+		
+		
 	}
 	
 	public static function getProductById($id){
@@ -74,16 +78,16 @@ class DB{
 	public static function insertUser($name,$identifier/*this is a string*/,$password){
 		//JUSTO: Insert user, return the insert id as in insertProduct();
 		
-		 $result=mysql_query( "INSERT INTO user (name, identifier, password) VALUES ("."'".$name."'"." ,"."'".$identifier."'"." ,"."'".$password."'".")" , DB::connection());
+		 //$result=mysql_query( "INSERT INTO user (name, identifier, password) VALUES ("."'".$name."'"." ,"."'".$identifier."'"." ,"."'".$password."'".")" , DB::connection());
 		 
-		  if ($stmt = self::connection()->prepare("INSERT INTO catype (name, identifier, password) VALUES (? ,?, ?)")) {
+		  if ($stmt = self::connection()->prepare("INSERT INTO user (name, identifier, password) VALUES (? ,?, ?)")) {
 	$stmt->bind_param("ssd", $name, $identifier, $password);
 	$stmt->execute();
 	$stmt->close();	
 	}
 		 	 
 		
-		$user_id=mysql_insert_id();
+		$user_id=mysqli_insert_id(self::connection());
 		
 		return $user_id;
 		
@@ -95,14 +99,14 @@ class DB{
     if ($stmt = self::connection()->prepare("SELECT * FROM user WHERE id = ?")) {
     $stmt->bind_param("i",$id);
     $stmt->execute();
-    $stmt->bind_result($id,$identifier,$password);
+    $stmt->bind_result($id,$name,$identifier,$password);
     $stmt->fetch();
     $stmt->close();
 	if($id==NULL){
 	return NULL;
 	}
     else{
-    return array($id,$identifier,$password);
+    return array($id,$name,$identifier,$password);
 	}
 	
     }else{
@@ -131,7 +135,7 @@ class DB{
 	$stmt->execute();
 	$stmt->close();	
 	}
-		$catype_id=mysql_insert_id();
+		$catype_id=mysqli_insert_id(self::connection());
 		
 		return $catype_id;
 		 
