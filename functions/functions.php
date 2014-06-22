@@ -376,11 +376,7 @@ class DB{
     $stmt->fetch();
     $stmt->close();
 	}
-	
-	
-	
-	
-		
+			
 		if($catype_id==NULL){
 			$everythig_deleted=TRUE;
 		}
@@ -427,8 +423,30 @@ class DB{
 	}
 	
 	
-	public static function getCategoryIdsForProduct($category_id){
+	public static function getCategoryIdsForProduct($product_id){
 		//Fetch all categories of a product. use product_has_category
+		
+		  
+   if ($stmt = self::connection()->prepare("SELECT * FROM product_has_category WHERE product_id = ?"))
+  {
+   $stmt->bind_param("i",$product_id);
+    $stmt->execute();
+    $stmt->bind_result($prod_id, $category_id);
+    $i=0;
+	while ($stmt->fetch()) {
+		$cat_ids[$i]=$category_id;
+		$i=$i+1;
+	}
+    $stmt->close();
+   }
+			
+	if($prod_id==NULL){
+	return FALSE;	
+	}
+	else{
+	return $cat_ids;
+ 	}
+	
 	}
 	
 

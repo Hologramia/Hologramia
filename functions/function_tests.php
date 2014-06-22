@@ -42,9 +42,11 @@ require_once('functions.php');
 
 //echo DB::removeCategoryWithId("5");
 
-echo DB::removeCatypeWithId("1");
+//echo DB::removeCatypeWithId("1");
 
-//DB::removeCategoryWithId("6")
+//DB::removeCategoryWithId("6");
+
+print_r(DB::getCategoryIdsForProduct("2"));
 
 
 
