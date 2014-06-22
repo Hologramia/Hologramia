@@ -431,6 +431,17 @@ class DB{
 			return $cat_ids;
 		}
 	}
+	
+	public static function getProducts($categoryIdArray,$resultLimit,$resultOffset)
+	{
+		//$categoryIdArray is an array of category id's
+		//Esto puede ser un poquito complicado desde el punto de vista logico pero tu eres bien inteligente.
+		//Creo que el truco es usar EXISTS un verguero de veces: http://dev.mysql.com/doc/refman/5.0/en/exists-and-not-exists-subqueries.html
+		//En resumen va a ser asi: SELECT * FROM product WHERE EXISTS(...) AND EXISTS(...) AND ...
+		//Donde hay un exist por cada categoris, y ese EXIST es un SELECT de product_has_category
+		//No lo tengo totalmente resuelto en mi mente, pero tu seguramente puedes figure it out tan rapido
+		//como yo. Echale machete pues.
+	}
 }
 
 ?>
