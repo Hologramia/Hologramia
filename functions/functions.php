@@ -514,6 +514,10 @@ class DB{
 	public static function getAllCategoriesWithCatypeId($catype_id){
 		//Devuelve todas las categories que tengan ese catype_id
 	}
+	
+	public static function getAllProducts(){
+		//Tabla product
+	}
 }
 
 ?>
