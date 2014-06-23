@@ -55,11 +55,13 @@ require_once('functions.php');
 
 //print_r(DB::getAllCatypes());
 
-print_r(DB::getAllCategoriesWithCatypeId("1"));
+//print_r(DB::getAllCategoriesWithCatypeId("1"));
 	
 //var_dump(DB::connection());
 	
 //echo "Hello world";
+
+print_r(DB::getAllProducts());
 
 
 ?>

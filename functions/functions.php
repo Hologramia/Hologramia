@@ -529,7 +529,6 @@ class DB{
 		
 		if ($id_array==NULL){
 		$result=NULL;
-		echo "yes";
 		}
 		else{
 		$result = $array_con_todo;
@@ -563,7 +562,7 @@ class DB{
 		
 		if ($id_array==NULL){
 		$result=NULL;
-		echo "yes";
+		
 		}
 		else{
 		$result = $array_con_todo;
@@ -576,6 +575,36 @@ class DB{
 	
 	public static function getAllProducts(){
 		//Tabla product
+		
+		if ($stmt = self::connection()->prepare("SELECT id,name,description,price FROM product")) {
+			//$stmt->bind_param(,);
+			$stmt->execute();
+			$stmt->bind_result($id,$name,$description,$price);
+			$i = 0;
+			while ($stmt->fetch()) {
+				$id_array[$i] = $id;
+				
+				$array_con_todo[$i] = array("id"=>$id, "name"=>$name, "description"=>$description, "price"=>$price);
+				
+				$i = $i + 1;
+			}
+
+			$stmt->close();
+		}
+		
+		
+		if ($id_array==NULL){
+		$result=NULL;
+	
+		}
+		else{
+		$result = $array_con_todo;
+		}
+		
+		//print_r($array_con_todo);
+		
+		return $result;		
+		
 	}
 }
 
