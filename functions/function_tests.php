@@ -53,11 +53,11 @@ require_once('functions.php');
 
 //print_r(mysqli_fetch_array($result));
 
-//print_r(DB::getAllCatypes());
+print_r(DB::getAllCatypes());
 	
 //var_dump(DB::connection());
 	
-echo "Hello world";
+//echo "Hello world";
 
 
 ?>
