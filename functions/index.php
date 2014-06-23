@@ -13,7 +13,14 @@
 
 <?php
 
+	$catypes = DB::getAllCatypes();
 	
+	$num_catypes = count($catypes);
+	for ($i=0;i<$num_catypes;$i+=1){
+		//if (){
+			
+		//}
+	}
 
 ?>
 
