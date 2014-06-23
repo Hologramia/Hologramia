@@ -19,10 +19,10 @@
 	for ($i=0;i<$num_catypes;$i+=1){
 ?>
 
-	<h2><?php print($catypes[$i]["name"]); ?></h2>
+		<h2><?php print($catypes[$i]["name"]); ?></h2>
 	
 <?php
-		if ($catypes[$i]["allows_multiple"]==0){
+		if ($catypes[$i]["allows_multiple"]==1){
 			
 		}else{
 			
