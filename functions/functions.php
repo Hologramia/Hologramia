@@ -445,7 +445,7 @@ class DB{
 		//No lo tengo totalmente resuelto en mi mente, pero tu seguramente puedes figure it out tan rapido
 		//como yo. Echale machete pues.
 		
-		if($categoryIdArray==NULL){
+		if($categoryIdArray==NULL || count($categoryIdArray)==0){
 			return FALSE;
 		}else{
 			$number_of_categories = sizeof($categoryIdArray);
@@ -509,6 +509,33 @@ class DB{
 	
 	public static function getAllCatypes(){
 		//Devuelve todas las catypes existentes. Toda la tabla catype.
+		
+		if ($stmt = self::connection()->prepare("SELECT * FROM catype")) {
+			//$stmt->bind_param(,);
+			$stmt->execute();
+			$stmt->bind_result($id, $name, $allows_multiple);
+			$i = 0;
+			while ($stmt->fetch()) {
+				$id_array[$i] = $id;
+				$name_array[$i] = $name;
+				$allows_multiple_array[$i] = $allows_multiple;
+				
+				$i = $i + 1;
+			}
+
+			$stmt->close();
+		}
+		
+		
+		if ($id_array==NULL){
+		$result=NULL;
+		echo "yes";
+		}
+		else{
+		$result = array_merge($id_array, $name_array, $allows_multiple_array);
+		}
+		
+		return $result;
 	}
 	
 	public static function getAllCategoriesWithCatypeId($catype_id){
