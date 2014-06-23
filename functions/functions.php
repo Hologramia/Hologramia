@@ -11,9 +11,12 @@ class DB{
 
 		$con = new mysqli("localhost", "root", "", "hologramia_schema");
 		if ($con->connect_errno) {
-			echo "Failed to connect to MySQL: (" . $con->connect_errno . ") " . $con->connect_error;
-			self::$connection = NULL;
-			return self::$connection;
+			$con = new mysqli("localhost", "root", "123", "hologramia_schema");
+			if ($con->connect_errno) {
+				echo "Failed to connect to MySQL: (" . $con->connect_errno . ") " . $con->connect_error;
+				self::$connection = NULL;
+				return self::$connection;
+			}
 		}
 
 		self::$connection = $con;
@@ -53,7 +56,7 @@ class DB{
 		// $result=mysql_query("SELECT * FROM product WHERE id=".$id.";", DB::connection());
 		// return mysql_fetch_row($result);
 
-		if ($stmt = self::connection()->prepare("SELECT * FROM product WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT id,name,description,price FROM product WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $description, $price);
@@ -64,10 +67,10 @@ class DB{
 			}
 			else {
 				return array(
-					$id,
-					$name,
-					$description,
-					$price
+					"id" => $id,
+					"name" => $name,
+					"description" => $description,
+					"price" =>$price
 				);
 			}
 		}
@@ -94,7 +97,7 @@ class DB{
 
 	public static function getUserById($id)
 	{
-		if ($stmt = self::connection()->prepare("SELECT * FROM user WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT id, name, identifier, password FROM user WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $identifier, $password);
@@ -105,10 +108,10 @@ class DB{
 			}
 			else {
 				return array(
-					$id,
-					$name,
-					$identifier,
-					$password
+					"id" => $id,
+					"name" => $name,
+					"identifier" => $identifier,
+					"password" => $password
 				);
 			}
 		}
@@ -141,7 +144,7 @@ class DB{
 
 	public static function getCategoryTypeById($id)
 	{
-		if ($stmt = self::connection()->prepare("SELECT * FROM catype WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $allows_multiple);
@@ -152,9 +155,9 @@ class DB{
 			}
 			else {
 				return array(
-					$id,
-					$name,
-					$allows_multiple
+					"id" => $id,
+					"name" => $name,
+					"allows_multiple" => $allows_multiple
 				);
 			}
 		}
@@ -177,7 +180,7 @@ class DB{
 
 	public static function getCategoryById($id)
 	{
-		if ($stmt = self::connection()->prepare("SELECT * FROM category WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT id, name, catype_id FROM category WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $catype_id);
@@ -188,9 +191,9 @@ class DB{
 			}
 			else {
 				return array(
-					$id,
-					$name,
-					$catype_id
+					"id" => $id,
+					"name" => $name,
+					"catype_id" => $catype_id
 				);
 			}
 		}
@@ -213,7 +216,7 @@ class DB{
 			$stmt->close();
 		}
 
-		if ($stmt = self::connection()->prepare("SELECT * FROM product WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT product_id, name, description, price FROM product WHERE id = ?")) {
 			$stmt->bind_param("i", $product_id);
 			$stmt->execute();
 			$stmt->bind_result($product_id, $name, $description, $price);
@@ -221,7 +224,7 @@ class DB{
 			$stmt->close();
 		}
 
-		if ($stmt = self::connection()->prepare("SELECT * FROM category WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT category_id, name, catype_id FROM category WHERE id = ?")) {
 			$stmt->bind_param("i", $category_id);
 			$stmt->execute();
 			$stmt->bind_result($category_id, $name, $catype_id);
@@ -250,7 +253,7 @@ class DB{
 		$everythig_deleted = FALSE;
 		while ($everythig_deleted == FALSE) {
 			$i = $i + 1;
-			if ($stmt = self::connection()->prepare("SELECT * FROM product WHERE id = ?")) {
+			if ($stmt = self::connection()->prepare("SELECT product_id, name, description, price FROM product WHERE id = ?")) {
 				$stmt->bind_param("i", $id);
 				$stmt->execute();
 				$stmt->bind_result($product_id, $name, $description, $price);
@@ -286,7 +289,7 @@ class DB{
 
 	public static function removeUserWithId($id)
 	{
-		if ($stmt = self::connection()->prepare("SELECT * FROM user WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT user_id, name, identifier, password FROM user WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($user_id, $name, $identifier, $password);
@@ -317,7 +320,7 @@ class DB{
 		$everythig_deleted = FALSE;
 		while ($everythig_deleted == FALSE) {
 			$i = $i + 1;
-			if ($stmt = self::connection()->prepare("SELECT * FROM category WHERE id = ?")) {
+			if ($stmt = self::connection()->prepare("SELECT category_id, name, catype_id FROM category WHERE id = ?")) {
 				$stmt->bind_param("i", $id);
 				$stmt->execute();
 				$stmt->bind_result($category_id, $name, $catype_id);
@@ -361,7 +364,7 @@ class DB{
 		$everythig_deleted = FALSE;
 		while ($everythig_deleted == FALSE) {
 			$i = $i + 1;
-			if ($stmt = self::connection()->prepare("SELECT * FROM catype WHERE id = ?")) {
+			if ($stmt = self::connection()->prepare("SELECT catype_id, name, allows_multiple FROM catype WHERE id = ?")) {
 				$stmt->bind_param("i", $id);
 				$stmt->execute();
 				$stmt->bind_result($catype_id, $name, $allows_multiple);
@@ -379,7 +382,7 @@ class DB{
 					$stmt->close();
 				}
 
-				if ($stmt = self::connection()->prepare("SELECT * FROM category WHERE catype_id = ?")) {
+				if ($stmt = self::connection()->prepare("SELECT category_id, name, catype_id FROM category WHERE catype_id = ?")) {
 					$stmt->bind_param("i", $catype_id);
 					$stmt->execute();
 					$stmt->bind_result($category_id, $name, $catype_id);
@@ -411,7 +414,7 @@ class DB{
 
 		// Fetch all categories of a product. use product_has_category
 
-		if ($stmt = self::connection()->prepare("SELECT * FROM product_has_category WHERE product_id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT product_id, category_id FROM product_has_category WHERE product_id = ?")) {
 			$stmt->bind_param("i", $product_id);
 			$stmt->execute();
 			$stmt->bind_result($prod_id, $category_id);
@@ -442,13 +445,13 @@ class DB{
 		//No lo tengo totalmente resuelto en mi mente, pero tu seguramente puedes figure it out tan rapido
 		//como yo. Echale machete pues.
 		
-		if($categoryIdArray==NULL){
+		if($categoryIdArray==NULL || count($categoryIdArray)==0){
 			return FALSE;
 		}else{
 			$number_of_categories = sizeof($categoryIdArray);
-			$sql_statement= "SELECT*FROM product_has_category AS table1 WHERE category_id = ?";
+			$sql_statement= "SELECT product_id, category_id FROM product_has_category AS table1 WHERE category_id = ?";
 			for($i=1;$i<=$number_of_categories-1;$i=$i+1){
-				$sql_statement=$sql_statement." AND EXISTS (SELECT*FROM product_has_category AS table".strval($i+1)." WHERE category_id = ? AND table".strval($i).".product_id = table".strval($i+1).".product_id";
+				$sql_statement=$sql_statement." AND EXISTS (SELECT product_id, category_id FROM product_has_category AS table".strval($i+1)." WHERE category_id = ? AND table".strval($i).".product_id = table".strval($i+1).".product_id";
 			}
 		}
 			
@@ -483,7 +486,12 @@ class DB{
 		}
 	}
 	
+<<<<<<< HEAD
 	public static function insertCategories($catype_id,$name,$allows_multiple){
+=======
+	public static function insertCategories($catype_name,$allows_multiple,$categoryNames)
+	{
+>>>>>>> origin/master
 		//( 1 ) Primero se verifica si ya existe una entrada en la tabla catype que tenga
 		//         name=$catypename.
 		//(1.1) Si la hay, se obtiene el id, digamos $id, y se agregan entradas a la tabla
@@ -506,6 +514,7 @@ class DB{
 		//         en (1.1), se agregan entradas a la tabla category con "name" tomados del
 		//         array $categoryNames, y con catype_id=$id
 		
+<<<<<<< HEAD
 		  if ($stmt = self::connection()->prepare("INSERT INTO catype ($catype_id, $name, $allows_multiple) VALUES (? , ?, ?)")) {
 			$stmt->bind_param("s", $catype_id, $name, $allows_multiple);
 			$stmt->execute();
@@ -522,16 +531,119 @@ class DB{
 		
 				
 			}
+=======
+		// Return the la funcion = array de todos los ids de insercion obtenidos.
+		
+		
+		
+		
+		
+		//-------------
+	}
+	
+>>>>>>> origin/master
 	
 	        
 	public static function getAllCatypes(){
 		//Devuelve todas las catypes existentes. Toda la tabla catype.
+		
+		if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype")) {
+			//$stmt->bind_param(,);
+			$stmt->execute();
+			$stmt->bind_result($id, $name, $allows_multiple);
+			$i = 0;
+			while ($stmt->fetch()) {
+				$id_array[$i] = $id;
+				
+				$array_con_todo[$i] = array("id"=>$id, "name"=>$name, "allows_multiple"=>$allows_multiple);
+				
+				$i = $i + 1;
+			}
+
+			$stmt->close();
+		}
+		
+		
+		if ($id_array==NULL){
+		$result=NULL;
+		}
+		else{
+		$result = $array_con_todo;
+		}
+		
+		//print_r($array_con_todo);
+		
+		return $result;		
+		
 	}
 	
 	
 	
 	public static function getAllCategoriesWithCatypeId($catype_id){
 		//Devuelve todas las categories que tengan ese catype_id
+		
+	  if ($stmt = self::connection()->prepare("SELECT id, name, catype_id FROM category WHERE catype_id = ?")) {
+			$stmt->bind_param("i",$catype_id);
+			$stmt->execute();
+			$stmt->bind_result($category_id, $name, $catype_id);
+			$i = 0;
+			while ($stmt->fetch()) {
+				$id_array[$i] = $id;
+				
+				$array_con_todo[$i] = array("id"=>$category_id, "name"=>$name, "catype_id"=>$catype_id);
+				
+				$i = $i + 1;
+			}
+
+			$stmt->close();
+		}
+		
+		
+		if ($id_array==NULL){
+		$result=NULL;
+		
+		}
+		else{
+		$result = $array_con_todo;
+		}
+		
+		
+		return $result;		
+		
+	}
+	
+	public static function getAllProducts(){
+		//Tabla product
+		
+		if ($stmt = self::connection()->prepare("SELECT id,name,description,price FROM product")) {
+			//$stmt->bind_param(,);
+			$stmt->execute();
+			$stmt->bind_result($id,$name,$description,$price);
+			$i = 0;
+			while ($stmt->fetch()) {
+				$id_array[$i] = $id;
+				
+				$array_con_todo[$i] = array("id"=>$id, "name"=>$name, "description"=>$description, "price"=>$price);
+				
+				$i = $i + 1;
+			}
+
+			$stmt->close();
+		}
+		
+		
+		if ($id_array==NULL){
+		$result=NULL;
+	
+		}
+		else{
+		$result = $array_con_todo;
+		}
+		
+		//print_r($array_con_todo);
+		
+		return $result;		
+		
 	}
 }
 
