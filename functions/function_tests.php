@@ -48,7 +48,7 @@ require_once('functions.php');
 
 //print_r(DB::getCategoryIdsForProduct("1"));
 
-DB::getProducts(array("1", "2", "4"),"1","1");
+//DB::getProducts(array("1", "2", "4"),"1","1");
 
 
 //print_r(mysqli_fetch_array($result));
