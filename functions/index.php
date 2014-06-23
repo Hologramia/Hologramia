@@ -17,14 +17,24 @@
 	
 	$num_catypes = count($catypes);
 	for ($i=0;i<$num_catypes;$i+=1){
-		//if (){
+?>
+
+	<h2><?php print($catypes[$i]["name"]); ?></h2>
+	
+<?php
+		if ($catypes[$i]["allows_multiple"]==0){
 			
-		//}
+		}else{
+			
+		}
 	}
 
 ?>
 
 	</form>
+	
+	</h2>Resultados:</h2>
+	
 	
 	
 	</body>
