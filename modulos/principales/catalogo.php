@@ -36,7 +36,7 @@ $contador = 1;
 for ($x=1;$x<6; $x++){
 while ($row = mysql_fetch_array($sql))
 {
-if ($contador > 6) {
+if ($contador >6) {
 echo "<tr></tr>";
 }
 ?>
@@ -71,6 +71,7 @@ echo "<tr></tr>";
 
 <?php
 $contador++;
+
 }
 }
 ?> 
