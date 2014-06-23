@@ -483,33 +483,52 @@ class DB{
 		}
 	}
 	
-	public static function insertCategories($catype_name,$allows_multiple,$categoryNames);
-	{
+	public static function insertCategories($catype_id,$name,$allows_multiple){
 		//( 1 ) Primero se verifica si ya existe una entrada en la tabla catype que tenga
-		//         name=$catypeName.
+		//         name=$catypename.
 		//(1.1) Si la hay, se obtiene el id, digamos $id, y se agregan entradas a la tabla
-		//         category con "name" tomados del array $categoryNames, y con catype_id=$id
-		//(1.2) Si no la hay, entonces, se crea una entrada de la tabla catype con
+		//         category con "name" tomados del array $categorynames, y con catype_id=$id
+		// Return the la funcion = array de todos los ids de insercion obtenidos.
+       //-------------
+	  
+	if ($stmt = self::connection()->prepare("SELECT catype_id name allows_multiple FROM catype WHERE name = ?")) {
+				$stmt->bind_param("s", $name);
+				$stmt->execute();
+				$stmt->bind_result($catype_id, $name, $allows_multiple);
+				$stmt->fetch();
+				$stmt->close();
+			}
+			echo $catype_id, $name, $allows_multiple;
+			
+			if ($name==NULL){
+				//(1.2) Si no la hay, entonces, se crea una entrada de la tabla catype con
 		//         name=$catypeName, se obtiene su id de insercion, digamos $id, y al igual que
-		//         en (1.1), se agregan entradas a la tablac ategory con "name" tomados del
+		//         en (1.1), se agregan entradas a la tabla category con "name" tomados del
 		//         array $categoryNames, y con catype_id=$id
 		
-		// Return the la funcion = array de todos los ids de insercion obtenidos.
+		  if ($stmt = self::connection()->prepare("INSERT INTO catype ($catype_id, $name, $allows_multiple) VALUES (? , ?, ?)")) {
+			$stmt->bind_param("s", $catype_id, $name, $allows_multiple);
+			$stmt->execute();
+			$stmt->close();
+		}
+
+		$catype_id = mysqli_insert_id(self::connection());
+								
+			}
+			else{}
+				//(1.1) Si la hay, se obtiene el id, digamos $id, y se agregan entradas a la tabla
+		//         category con "name" tomados del array $categoryNames, y con catype_id=$id
 		
 		
-		
-		
-		
-		
-		
-		
-		//-------------
-	}
+				
+			}
 	
-	
+	        
 	public static function getAllCatypes(){
 		//Devuelve todas las catypes existentes. Toda la tabla catype.
 	}
+	
+	
 	
 	public static function getAllCategoriesWithCatypeId($catype_id){
 		//Devuelve todas las categories que tengan ese catype_id
