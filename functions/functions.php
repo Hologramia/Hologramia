@@ -56,7 +56,7 @@ class DB{
 		// $result=mysql_query("SELECT * FROM product WHERE id=".$id.";", DB::connection());
 		// return mysql_fetch_row($result);
 
-		if ($stmt = self::connection()->prepare("SELECT (id,name,description,price) FROM product WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT id,name,description,price FROM product WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $description, $price);
@@ -67,10 +67,10 @@ class DB{
 			}
 			else {
 				return array(
-					$id,
-					$name,
-					$description,
-					$price
+					"id" => $id,
+					"name" => $name,
+					"description" => $description,
+					"price" =>$price
 				);
 			}
 		}
@@ -97,7 +97,7 @@ class DB{
 
 	public static function getUserById($id)
 	{
-		if ($stmt = self::connection()->prepare("SELECT (id, name, identifier, password) FROM user WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT id, name, identifier, password FROM user WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $identifier, $password);
@@ -108,10 +108,10 @@ class DB{
 			}
 			else {
 				return array(
-					$id,
-					$name,
-					$identifier,
-					$password
+					"id" => $id,
+					"name" => $name,
+					"identifier" => $identifier,
+					"password" => $password
 				);
 			}
 		}
@@ -144,7 +144,7 @@ class DB{
 
 	public static function getCategoryTypeById($id)
 	{
-		if ($stmt = self::connection()->prepare("SELECT (id, name, allows_multiple) FROM catype WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $allows_multiple);
@@ -155,9 +155,9 @@ class DB{
 			}
 			else {
 				return array(
-					$id,
-					$name,
-					$allows_multiple
+					"id" => $id,
+					"name" => $name,
+					"allows_multiple" => $allows_multiple
 				);
 			}
 		}
@@ -180,7 +180,7 @@ class DB{
 
 	public static function getCategoryById($id)
 	{
-		if ($stmt = self::connection()->prepare("SELECT (id, name, catype_id) FROM category WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT id, name, catype_id FROM category WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $catype_id);
@@ -191,9 +191,9 @@ class DB{
 			}
 			else {
 				return array(
-					$id,
-					$name,
-					$catype_id
+					"id" => $id,
+					"name" => $name,
+					"catype_id" => $catype_id
 				);
 			}
 		}
@@ -216,7 +216,7 @@ class DB{
 			$stmt->close();
 		}
 
-		if ($stmt = self::connection()->prepare("SELECT (product_id, name, description, price) FROM product WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT product_id, name, description, price FROM product WHERE id = ?")) {
 			$stmt->bind_param("i", $product_id);
 			$stmt->execute();
 			$stmt->bind_result($product_id, $name, $description, $price);
@@ -224,7 +224,7 @@ class DB{
 			$stmt->close();
 		}
 
-		if ($stmt = self::connection()->prepare("SELECT (category_id, name, catype_id) FROM category WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT category_id, name, catype_id FROM category WHERE id = ?")) {
 			$stmt->bind_param("i", $category_id);
 			$stmt->execute();
 			$stmt->bind_result($category_id, $name, $catype_id);
@@ -253,7 +253,7 @@ class DB{
 		$everythig_deleted = FALSE;
 		while ($everythig_deleted == FALSE) {
 			$i = $i + 1;
-			if ($stmt = self::connection()->prepare("SELECT (product_id, name, description, price) FROM product WHERE id = ?")) {
+			if ($stmt = self::connection()->prepare("SELECT product_id, name, description, price FROM product WHERE id = ?")) {
 				$stmt->bind_param("i", $id);
 				$stmt->execute();
 				$stmt->bind_result($product_id, $name, $description, $price);
@@ -289,7 +289,7 @@ class DB{
 
 	public static function removeUserWithId($id)
 	{
-		if ($stmt = self::connection()->prepare("SELECT (user_id, name, identifier, password) FROM user WHERE id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT user_id, name, identifier, password FROM user WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($user_id, $name, $identifier, $password);
@@ -320,7 +320,7 @@ class DB{
 		$everythig_deleted = FALSE;
 		while ($everythig_deleted == FALSE) {
 			$i = $i + 1;
-			if ($stmt = self::connection()->prepare("SELECT (category_id, name, catype_id) FROM category WHERE id = ?")) {
+			if ($stmt = self::connection()->prepare("SELECT category_id, name, catype_id FROM category WHERE id = ?")) {
 				$stmt->bind_param("i", $id);
 				$stmt->execute();
 				$stmt->bind_result($category_id, $name, $catype_id);
@@ -364,7 +364,7 @@ class DB{
 		$everythig_deleted = FALSE;
 		while ($everythig_deleted == FALSE) {
 			$i = $i + 1;
-			if ($stmt = self::connection()->prepare("SELECT (catype_id, name, allows_multiple) FROM catype WHERE id = ?")) {
+			if ($stmt = self::connection()->prepare("SELECT catype_id, name, allows_multiple FROM catype WHERE id = ?")) {
 				$stmt->bind_param("i", $id);
 				$stmt->execute();
 				$stmt->bind_result($catype_id, $name, $allows_multiple);
@@ -382,7 +382,7 @@ class DB{
 					$stmt->close();
 				}
 
-				if ($stmt = self::connection()->prepare("SELECT (category_id, name, catype_id) FROM category WHERE catype_id = ?")) {
+				if ($stmt = self::connection()->prepare("SELECT category_id, name, catype_id FROM category WHERE catype_id = ?")) {
 					$stmt->bind_param("i", $catype_id);
 					$stmt->execute();
 					$stmt->bind_result($category_id, $name, $catype_id);
@@ -414,7 +414,7 @@ class DB{
 
 		// Fetch all categories of a product. use product_has_category
 
-		if ($stmt = self::connection()->prepare("SELECT (product_id, category_id) FROM product_has_category WHERE product_id = ?")) {
+		if ($stmt = self::connection()->prepare("SELECT product_id, category_id FROM product_has_category WHERE product_id = ?")) {
 			$stmt->bind_param("i", $product_id);
 			$stmt->execute();
 			$stmt->bind_result($prod_id, $category_id);
@@ -449,9 +449,9 @@ class DB{
 			return FALSE;
 		}else{
 			$number_of_categories = sizeof($categoryIdArray);
-			$sql_statement= "SELECT (product_id, category_id) FROM product_has_category AS table1 WHERE category_id = ?";
+			$sql_statement= "SELECT product_id, category_id FROM product_has_category AS table1 WHERE category_id = ?";
 			for($i=1;$i<=$number_of_categories-1;$i=$i+1){
-				$sql_statement=$sql_statement." AND EXISTS (SELECT (product_id, category_id) FROM product_has_category AS table".strval($i+1)." WHERE category_id = ? AND table".strval($i).".product_id = table".strval($i+1).".product_id";
+				$sql_statement=$sql_statement." AND EXISTS (SELECT product_id, category_id FROM product_has_category AS table".strval($i+1)." WHERE category_id = ? AND table".strval($i).".product_id = table".strval($i+1).".product_id";
 			}
 		}
 			
@@ -510,7 +510,7 @@ class DB{
 	public static function getAllCatypes(){
 		//Devuelve todas las catypes existentes. Toda la tabla catype.
 		
-		if ($stmt = self::connection()->prepare("SELECT (id, name, allows_multiple) FROM catype")) {
+		if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype")) {
 			//$stmt->bind_param(,);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $allows_multiple);
@@ -519,6 +519,8 @@ class DB{
 				$id_array[$i] = $id;
 				$name_array[$i] = $name;
 				$allows_multiple_array[$i] = $allows_multiple;
+				
+				$array_con_todo[$i] = array("id"=>$id, "name"=>$name, "allows_multiple"=>$allows_multiple);
 				
 				$i = $i + 1;
 			}
@@ -532,8 +534,10 @@ class DB{
 		echo "yes";
 		}
 		else{
-		$result = array_merge($id_array, $name_array, $allows_multiple_array);
+		$result = $array_con_todo;
 		}
+		
+		//print_r($array_con_todo);
 		
 		return $result;
 	}
