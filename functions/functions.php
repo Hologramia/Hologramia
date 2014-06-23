@@ -505,6 +505,15 @@ class DB{
 		
 		//-------------
 	}
+	
+	
+	public static function getAllCatypes(){
+		//Devuelve todas las catypes existentes. Toda la tabla catype.
+	}
+	
+	public static function getAllCategoriesWithCatypeId($catype_id){
+		//Devuelve todas las categories que tengan ese catype_id
+	}
 }
 
 ?>
