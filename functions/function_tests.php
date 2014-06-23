@@ -54,7 +54,7 @@ require_once('functions.php');
 //print_r(mysqli_fetch_array($result));
 
 <<<<<<< HEAD
-echo DB::insertCategories("color","azul","1");	
+//DB::insertCategories("color","azul","1");	
 =======
 //print_r(DB::getAllCatypes());
 
