@@ -486,7 +486,7 @@ class DB{
 		}
 	}
 	
-	public static function insertCategories($catype_name,$allows_multiple,$categoryNames);
+	public static function insertCategories($catype_name,$allows_multiple,$categoryNames)
 	{
 		//( 1 ) Primero se verifica si ya existe una entrada en la tabla catype que tenga
 		//         name=$catypeName.
