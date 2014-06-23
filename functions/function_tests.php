@@ -32,7 +32,7 @@ require_once('functions.php');
 //echo DB::insertCategory("rojo","1");
 
 
-print_r(DB::getCategoryById("2"));
+//print_r(DB::getCategoryById("2"));
 
 //echo DB::addCategoryToProduct("10","10");
 
@@ -48,6 +48,13 @@ print_r(DB::getCategoryById("2"));
 
 //print_r(DB::getCategoryIdsForProduct("1"));
 
+DB::getProducts(array("1", "2", "4"),"1","1");
+
+
+//print_r(mysqli_fetch_array($result));
+
+	
+	
 
 
 ?>

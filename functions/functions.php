@@ -432,16 +432,77 @@ class DB{
 		}
 	}
 	
-	public static function getProducts($categoryIdArray,$resultLimit,$resultOffset)
-	{
-		//$categoryIdArray is an array of category id's
-		//Esto puede ser un poquito complicado desde el punto de vista logico pero tu eres bien inteligente.
-		//Creo que el truco es usar EXISTS un verguero de veces: http://dev.mysql.com/doc/refman/5.0/en/exists-and-not-exists-subqueries.html
-		//En resumen va a ser asi: SELECT * FROM product WHERE EXISTS(...) AND EXISTS(...) AND ...
-		//Donde hay un exist por cada categoris, y ese EXIST es un SELECT de product_has_category
-		//No lo tengo totalmente resuelto en mi mente, pero tu seguramente puedes figure it out tan rapido
-		//como yo. Echale machete pues.
+		public static function getProducts($categoryIdArray,$resultLimit,$resultOffset)
+		{
+			//$categoryIdArray is an array of category id's
+			//Esto puede ser un poquito complicado desde el punto de vista logico pero tu eres bien inteligente.
+			//Creo que el truco es usar EXISTS un verguero de veces: http://dev.mysql.com/doc/refman/5.0/en/exists-and-not-exists-subqueries.html
+			//En resumen va a ser asi: SELECT * FROM product WHERE EXISTS(...) AND EXISTS(...) AND ...
+			//Donde hay un exist por cada categoris, y ese EXIST es un SELECT de product_has_category
+			//No lo tengo totalmente resuelto en mi mente, pero tu seguramente puedes figure it out tan rapido
+			//como yo. Echale machete pues.
+			
+		
+			
+			
+			if($categoryIdArray==NULL){
+				return FALSE;
+			}
+			else{
+				$number_of_categories = sizeof($categoryIdArray);
+				$sql_statement= "SELECT*FROM product_has_category AS table1 WHERE category_id = ?";
+				for($i=1;$i<=$number_of_categories-1;$i=$i+1){
+				
+				$sql_statement=$sql_statement." AND EXISTS (SELECT*FROM product_has_category AS table".strval($i+1)." WHERE category_id = ? AND table".strval($i).".product_id = table".strval($i+1).".product_id";
+					
+					
+				}
+				
+				
+			}
+			
+			$type = "i";
+			for($i=1;$i<=$number_of_categories-1;$i=$i+1){
+				$sql_statement=$sql_statement.")";
+				$type = $type."i";
+			}
+			
+			
+			function refValues($arr)
+	{ 
+			$refs = array();
+	
+			foreach ($arr as $key => $value)
+			{
+				$refs[$key] = &$arr[$key]; 
+			}
+	
+			return $refs; 
 	}
+			
+	
+	if ($stmt = self::connection()->prepare($sql_statement)) {
+					 
+		$param = $categoryIdArray;
+		call_user_func_array('mysqli_stmt_bind_param', array_merge(array($stmt, $type),refValues($categoryIdArray)));
+		
+		$stmt->execute();
+					$stmt->bind_result($product_id, $category_id);
+					$i = 0;
+					while ($stmt->fetch()) {
+						$prod_ids[$i] = $product_id;
+						echo $product_id;
+						$i = $i + 1;
+					}
+		
+					$stmt->close();
+		
+					
+	}
+			
+			
+			
+		}
 }
 
 ?>
