@@ -53,7 +53,9 @@ require_once('functions.php');
 
 //print_r(mysqli_fetch_array($result));
 
-print_r(DB::getAllCatypes());
+//print_r(DB::getAllCatypes());
+
+print_r(DB::getAllCategoriesWithCatypeId("1"));
 	
 //var_dump(DB::connection());
 	

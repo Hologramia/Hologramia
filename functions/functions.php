@@ -517,8 +517,6 @@ class DB{
 			$i = 0;
 			while ($stmt->fetch()) {
 				$id_array[$i] = $id;
-				$name_array[$i] = $name;
-				$allows_multiple_array[$i] = $allows_multiple;
 				
 				$array_con_todo[$i] = array("id"=>$id, "name"=>$name, "allows_multiple"=>$allows_multiple);
 				
@@ -539,11 +537,41 @@ class DB{
 		
 		//print_r($array_con_todo);
 		
-		return $result;
+		return $result;		
+		
 	}
 	
 	public static function getAllCategoriesWithCatypeId($catype_id){
 		//Devuelve todas las categories que tengan ese catype_id
+		
+	  if ($stmt = self::connection()->prepare("SELECT id, name, catype_id FROM category WHERE catype_id = ?")) {
+			$stmt->bind_param("i",$catype_id);
+			$stmt->execute();
+			$stmt->bind_result($category_id, $name, $catype_id);
+			$i = 0;
+			while ($stmt->fetch()) {
+				$id_array[$i] = $id;
+				
+				$array_con_todo[$i] = array("id"=>$category_id, "name"=>$name, "catype_id"=>$catype_id);
+				
+				$i = $i + 1;
+			}
+
+			$stmt->close();
+		}
+		
+		
+		if ($id_array==NULL){
+		$result=NULL;
+		echo "yes";
+		}
+		else{
+		$result = $array_con_todo;
+		}
+		
+		
+		return $result;		
+		
 	}
 	
 	public static function getAllProducts(){
