@@ -494,13 +494,10 @@ class DB{
 		//         category con "name" tomados del array $categoryNames, y con catype_id=$id
 		//(1.2) Si no la hay, entonces, se crea una entrada de la tabla catype con
 		//         name=$catypeName, se obtiene su id de insercion, digamos $id, y al igual que
-		//         en (1.1), se agregan entradas a la tablac ategory con "name" tomados del
+		//         en (1.1), se agregan entradas a la tabla category con "name" tomados del
 		//         array $categoryNames, y con catype_id=$id
 		
 		// Return the la funcion = array de todos los ids de insercion obtenidos.
-		
-		
-		
 		
 		
 		
