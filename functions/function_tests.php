@@ -53,19 +53,21 @@ require_once('functions.php');
 
 //print_r(mysqli_fetch_array($result));
 
-<<<<<<< HEAD
+
 //DB::insertCategories("color","azul","1");	
-=======
+
 //print_r(DB::getAllCatypes());
 
 //print_r(DB::getAllCategoriesWithCatypeId("1"));
 	
 //var_dump(DB::connection());
->>>>>>> origin/master
+
 	
 //echo "Hello world";
 
-print_r(DB::getAllProducts());
+//print_r(DB::getAllProducts());
+
+DB::insertCategories("color","rojo","1");
 
 
 ?>
