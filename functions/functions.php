@@ -246,7 +246,6 @@ class DB{
 
 	public static function removeProductWithId($id)
 	{
-
 		// This should also remove all entries in product_has_category with this product_id
 
 		$i = 0;
@@ -489,14 +488,17 @@ class DB{
 
 	public static function insertCategories($catype_name, $categoryNames, $allows_multiple)
 	{
-
 		//( 1 ) Primero se verifica si ya existe una entrada en la tabla catype que tenga
 		//         name=$catypename.
 		//(1.1) Si la hay, se obtiene el id, digamos $id, y se agregan entradas a la tabla
 		//         category con "name" tomados del array $categorynames, y con catype_id=$id
 		// Return the la funcion = array de todos los ids de insercion obtenidos.
        //-------------
+	  //echo $catype_name;
+	  //print_r($categoryNames);
+	  //echo $allows_multiple;
 	  
+	 
 	  
 	if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype WHERE name = ?")) {
 				$stmt->bind_param("s", $catype_name);
@@ -505,8 +507,8 @@ class DB{
 				$stmt->fetch();
 				$stmt->close();
 			}
-		
-			
+	
+	
 			if ($catype_id==NULL){
 				//(1.2) Si no la hay, entonces, se crea una entrada de la tabla catype con
 		//         name=$catypeName, se obtiene su id de insercion, digamos $id, y al igual que
@@ -523,26 +525,29 @@ class DB{
 		return $catype_id;
 								
 			}
+			 
 				
 					//(1.1) Si la hay, se obtiene el id, digamos $id, y se agregan entradas a la tabla
 		//         category con "name" tomados del array $categoryNames, y con catype_id=$id
 		
-				
-				
-		if ($categoryNames=NULL){
+		if ($categoryNames==NULL){
 		return NULL;	
 		}
 	    else{
+			
+		
 		$number_of_categories=sizeof($categoryNames);
 		
+		//echo $number_of_categories;
 		
 		for ($i=0;$i<=$number_of_categories-1;$i=$i+1){
 		
 			$categories_ids[$i]=self::insertCategory($categoryNames[$i], $catype_id);
 			
+		//print_r($categories_ids);
+			
 		}
-		
-		
+				
 		return $categories_ids;
 		
 		}

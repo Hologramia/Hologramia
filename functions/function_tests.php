@@ -67,7 +67,9 @@ require_once('functions.php');
 
 //print_r(DB::getAllProducts());
 
-DB::insertCategories("color","rojo","1");
+$catego=array("rojo");
+
+print_r(DB::insertCategories("color",$catego,"1"));
 
 
 ?>
