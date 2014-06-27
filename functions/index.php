@@ -135,9 +135,9 @@
 			//$catype = DB::insertCategoryType("Talla",FALSE);
 			//print("inserted catype: $catype");
 			
-			$category = DB::insertCategory("Verde",4);
-			print("|inserted:");
-			var_dump($category);
+			//$category = DB::insertCategory("Verde",4);
+			//print("|inserted:");
+			//var_dump($category);
 		}
 	
 	?>
