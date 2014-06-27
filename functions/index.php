@@ -86,7 +86,7 @@
 		}
 	}
 	
-	$products = getProducts($categoryIdArray,100,0)
+	$products = getProducts($categoryIdArray,100,0);
 	
 	$num_products = count($products);
 	

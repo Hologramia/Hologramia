@@ -606,7 +606,7 @@ class DB{
 			$stmt->bind_result($category_id, $name, $catype_id);
 			$i = 0;
 			while ($stmt->fetch()) {
-				$id_array[$i] = $id;
+				$id_array[$i] = $category_id;
 				
 				$array_con_todo[$i] = array("id"=>$category_id, "name"=>$name, "catype_id"=>$catype_id);
 				
