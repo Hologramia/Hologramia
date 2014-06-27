@@ -102,8 +102,6 @@
 		}
 	}
 	
-	
-	
 	$products = DB::getProducts($categoryIdArray,100,0);
 	
 	

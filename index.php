@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Hologramia</title>
+<title></title>
 <link href="css/estilos.css" rel="stylesheet" type="text/css" />
 <link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css" />
 <script src="SpryAssets/SpryTabbedPanels.js" type="text/javascript"></script>
@@ -29,7 +29,6 @@
 
 <div id="contenedor_pie">
 <?php include ("includes/desarrollo.php");?>
-
 
 
 </body>
