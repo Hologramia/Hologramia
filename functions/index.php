@@ -36,7 +36,13 @@
 			for ($j=0;$j<$num_categories;$j+=1){
 ?>
 
-		<input type="checkbox" name="cat<?php print($catypes[$i]["id"]); ?>" value="<?php print($categories[$j]["id"]); ?>"<?php print(($_GET["cat".$catypes[$i]["id"]].""==$categories[$j]["id"]."")?" checked":""); ?>/><?php print($categories[$j]["name"]); ?><br/>
+		<input type="checkbox" name="cat<?php print($catypes[$i]["id"]); ?>" value="<?php print($categories[$j]["id"]); ?>"<?php
+		
+			if (array_key_exists("cat".$catypes[$i]["id"],$_GET)){
+				print(($_GET["cat".$catypes[$i]["id"]].""==$categories[$j]["id"]."")?" checked":"");
+			}
+			
+		?>/><?php print($categories[$j]["name"]); ?><br/>
 
 <?php
 			}
@@ -45,7 +51,15 @@
 			
 ?>
 			
-		<input type="radio" name="cat<?php print($catypes[$i]["id"]); ?>" value=""<?php print(($_GET["cat".$catypes[$i]["id"]].""=="")?" checked":""); ?>/>(cualquier)<br/>
+		<input type="radio" name="cat<?php print($catypes[$i]["id"]); ?>" value=""<?php
+		
+			if (array_key_exists("cat".$catypes[$i]["id"],$_GET)){
+				print(($_GET["cat".$catypes[$i]["id"]].""=="")?" checked":"");
+			}else{
+				print(" checked");
+			}
+		
+		?>/>(cualquier)<br/>
 	
 <?php
 
@@ -56,7 +70,13 @@
 			for ($j=0;$j<$num_categories;$j+=1){
 ?>
 
-		<input type="radio" name="cat<?php print($catypes[$i]["id"]); ?>" value="<?php print($categories[$j]["id"]); ?>"<?php print(($_GET["cat".$catypes[$i]["id"]].""==$categories[$j]["id"]."")?" checked":""); ?>/><?php print($categories[$j]["name"]); ?><br/>
+		<input type="radio" name="cat<?php print($catypes[$i]["id"]); ?>" value="<?php print($categories[$j]["id"]); ?>"<?php
+		
+			if (array_key_exists("cat".$catypes[$i]["id"],$_GET)){
+				print(($_GET["cat".$catypes[$i]["id"]].""==$categories[$j]["id"]."")?" checked":"");
+			}
+		
+		?>/><?php print($categories[$j]["name"]); ?><br/>
 
 <?php
 			}
