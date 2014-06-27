@@ -1,4 +1,5 @@
 <?php
+
 	require_once('functions.php');
 ?>
 
@@ -8,7 +9,7 @@
 	
 	<h1>Prueba de productos filtrados por categor&iacute;a</h1>
 	
-	</h2>Par&aacute;metros:</h2>
+	<h2>Par&aacute;metros:</h2>
 	<form>
 
 <?php
@@ -16,6 +17,7 @@
 	$catypes = DB::getAllCatypes();
 	
 	$num_catypes = count($catypes);
+	
 	for ($i=0;$i<$num_catypes;$i+=1){
 ?>
 
@@ -60,6 +62,13 @@
 			}
 			
 		}
+		
+?>
+
+		<br/><br/>
+
+<?php
+		
 	}
 
 ?>
@@ -68,7 +77,7 @@
 
 	</form>
 	
-	</h2>Resultados:</h2>
+	<h2>Resultados:</h2>
 	
 <?php
 	
@@ -78,15 +87,26 @@
 		if ($key){
 			if (substr($key,0,3) === "cat") {
      			$id = substr($key,3)+0;
-     			$category = DB::getCategoryById($id);
-     			if ($category != NULL){
-     				array_push($categoryIdArray, "apple", "raspberry");
+     			$catype = DB::getCategoryTypeById($id);
+     			if ($catype != NULL){
+     				$category = DB::getCategoryById($value);
+     				if ($category != NULL){
+     					if ($category["catype_id"]==$catype["id"]){
+     						array_push($categoryIdArray,$id);
+     					}else{
+     						print("bad category match.");
+     					}
+     				}
      			}
 			}
 		}
 	}
 	
-	$products = getProducts($categoryIdArray,100,0)
+	
+	
+	$products = DB::getProducts($categoryIdArray,100,0);
+	
+	
 	
 	$num_products = count($products);
 	
@@ -101,6 +121,28 @@
 	}
 	
 ?>
+	<br/>
+	--
+	
+	<?php
+	
+		if ($_GET["do"]=="yes"){
+			//DB::insertProduct("Zapato Pequeño","Muy chiquito este zapato",22.25);
+			//DB::insertProduct("Zapato Grande","Este zapato es gigante",100.1);
+			//$id = DB::insertProduct("Pantalon","Blue jean",10000);
+			//print("insert id: ".$id);
+			//$product = DB::getProductById(3);
+			//var_dump($product);
+			
+			//$catype = DB::insertCategoryType("Talla",FALSE);
+			//print("inserted catype: $catype");
+			
+			$category = DB::insertCategory("Verde",4);
+			print("|inserted:");
+			var_dump($category);
+		}
+	
+	?>
 	
 	</body>
 

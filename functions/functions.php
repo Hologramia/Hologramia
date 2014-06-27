@@ -62,7 +62,7 @@ class DB{
 			$stmt->bind_result($id, $name, $description, $price);
 			$stmt->fetch();
 			$stmt->close();
-			if ($id == NULL) {
+			if ($id == NULL || $name == NULL) {
 				return NULL;
 			}
 			else {
@@ -103,7 +103,7 @@ class DB{
 			$stmt->bind_result($id, $name, $identifier, $password);
 			$stmt->fetch();
 			$stmt->close();
-			if ($id == NULL) {
+			if ($id == NULL || $name == NULL) {
 				return NULL;
 			}
 			else {
@@ -150,7 +150,7 @@ class DB{
 			$stmt->bind_result($id, $name, $allows_multiple);
 			$stmt->fetch();
 			$stmt->close();
-			if ($id == NULL) {
+			if ($id == NULL || $name == NULL) {
 				return NULL;
 			}
 			else {
@@ -186,10 +186,9 @@ class DB{
 			$stmt->bind_result($id, $name, $catype_id);
 			$stmt->fetch();
 			$stmt->close();
-			if ($id == NULL) {
+			if ($id == NULL || $name == NULL) {
 				return NULL;
-			}
-			else {
+			}else {
 				return array(
 					"id" => $id,
 					"name" => $name,
@@ -445,8 +444,10 @@ class DB{
 		//como yo. Echale machete pues.
 		
 		if($categoryIdArray==NULL || count($categoryIdArray)==0){
-			return FALSE;
+			//print("reuturning empty array");
+			return [];
 		}else{
+			//print("reuturning non- empty array");
 			$number_of_categories = sizeof($categoryIdArray);
 			$sql_statement= "SELECT product_id, category_id FROM product_has_category AS table1 WHERE category_id = ?";
 			for($i=1;$i<=$number_of_categories-1;$i=$i+1){
