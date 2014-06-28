@@ -315,7 +315,7 @@ class DB{
 			return FALSE;
 		}
 		else {
-			if ($stmt = self::connection()->prepare("DELETE FROM user WHERE id = ?")) {
+			if ($stmt = self::connection()->prepare("DELETE FROM user WHERE id = ?"))            {
 				$stmt->bind_param("i", $user_id);
 				$stmt->execute();
 				$stmt->close();
