@@ -144,7 +144,7 @@
 	
 	<?php
 	
-		if ($_GET["do"]=="yes"){
+		//if ($_GET["do"]=="yes"){
 			//DB::insertProduct("Zapato Pequeño","Muy chiquito este zapato",22.25);
 			//DB::insertProduct("Zapato Grande","Este zapato es gigante",100.1);
 			//$id = DB::insertProduct("Pantalon","Blue jean",10000);
@@ -158,7 +158,7 @@
 			//$category = DB::insertCategory("Verde",4);
 			//print("|inserted:");
 			//var_dump($category);
-		}
+		//}
 	
 	?>
 	
