@@ -56,13 +56,17 @@ class DB{
 		// $result=mysql_query("SELECT * FROM product WHERE id=".$id.";", DB::connection());
 		// return mysql_fetch_row($result);
 
+        $id = NULL;
+	    $name = NULL;
+        
 		if ($stmt = self::connection()->prepare("SELECT id,name,description,price FROM product WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $description, $price);
 			$stmt->fetch();
 			$stmt->close();
-			if ($id == NULL || $name == NULL) {
+		}
+			if (count($id)<1 || count($name)<1) {
 				return NULL;
 			}
 			else {
@@ -73,10 +77,8 @@ class DB{
 					"price" =>$price
 				);
 			}
-		}
-		else {
-			return NULL;
-		}
+		
+		
 	}
 
 	public static function insertUser($name, $identifier, $password)
@@ -97,13 +99,17 @@ class DB{
 
 	public static function getUserById($id)
 	{
+		$id = NULL;
+		$name = NULL;
+		
 		if ($stmt = self::connection()->prepare("SELECT id, name, identifier, password FROM user WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $identifier, $password);
 			$stmt->fetch();
 			$stmt->close();
-			if ($id == NULL || $name == NULL) {
+		}
+			if (count($id)<1 || count($name)<1) {
 				return NULL;
 			}
 			else {
@@ -114,10 +120,7 @@ class DB{
 					"password" => $password
 				);
 			}
-		}
-		else {
-			return NULL;
-		}
+		
 	}
 
 	public static function insertCategoryType($name, $allows_multiple)
@@ -144,13 +147,19 @@ class DB{
 
 	public static function getCategoryTypeById($id)
 	{
+		$id = NULL; 
+		$name = NULL;
+		$allows_multiple=NULL;
+		
 		if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $allows_multiple);
 			$stmt->fetch();
 			$stmt->close();
-			if ($id == NULL || $name == NULL) {
+		    }
+			
+			if (count($id)<1 || count($name)<1) {
 				return NULL;
 			}
 			else {
@@ -160,10 +169,7 @@ class DB{
 					"allows_multiple" => $allows_multiple
 				);
 			}
-		}
-		else {
-			return NULL;
-		}
+			
 	}
 
 	public static function insertCategory($name, $catype_id)
@@ -180,25 +186,28 @@ class DB{
 
 	public static function getCategoryById($id)
 	{
+		$id=NULL;
+		$name=NULL;
+		$catype_id=NULL;
+		
 		if ($stmt = self::connection()->prepare("SELECT id, name, catype_id FROM category WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $catype_id);
 			$stmt->fetch();
 			$stmt->close();
-			if ($id == NULL || $name == NULL) {
+		}
+			
+			if (count($id)<1 || count($name)<1) {
 				return NULL;
-			}else {
+			}else{
 				return array(
 					"id" => $id,
 					"name" => $name,
 					"catype_id" => $catype_id
 				);
 			}
-		}
-		else {
-			return NULL;
-		}
+			
 	}
 
 	public static function addCategoryToProduct($product_id, $category_id)
@@ -208,6 +217,9 @@ class DB{
 		// category, not of a catype. Make sure you understand the difference
 		// between these two.
 		// HOW TO MAKE THIS FUNCTION: Insert these values into the table product_has_category
+		
+		$product_id = NULL;
+		$category_id = NULL;
 
 		if ($stmt = self::connection()->prepare("INSERT INTO product_has_category (product_id, category_id) VALUES (? ,?)")) {
 			$stmt->bind_param("ii", $product_id, $category_id);
@@ -231,7 +243,7 @@ class DB{
 			$stmt->close();
 		}
 
-		if ($product_id == NULL OR $category_id == NULL) {
+		if (count($product_id)<1 OR count($category_id)<1) {
 			return FALSE;
 		}
 		else {
@@ -249,6 +261,7 @@ class DB{
 
 		$i = 0;
 		$everythig_deleted = FALSE;
+		$product_id = NULL;
 		while ($everythig_deleted == FALSE) {
 			$i = $i + 1;
 			if ($stmt = self::connection()->prepare("SELECT product_id, name, description, price FROM product WHERE id = ?")) {
@@ -259,7 +272,7 @@ class DB{
 				$stmt->close();
 			}
 
-			if ($product_id == NULL) {
+			if (count($product_id)<1) {
 				$everythig_deleted = TRUE;
 			}
 			else {
@@ -287,6 +300,9 @@ class DB{
 
 	public static function removeUserWithId($id)
 	{
+
+		$user_id = NULL;
+
 		if ($stmt = self::connection()->prepare("SELECT user_id, name, identifier, password FROM user WHERE id = ?")) {
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
@@ -295,7 +311,7 @@ class DB{
 			$stmt->close();
 		}
 
-		if ($user_id == NULL) {
+		if (count($user_id)<1) {
 			return FALSE;
 		}
 		else {
@@ -316,6 +332,8 @@ class DB{
 
 		$i = 0;
 		$everythig_deleted = FALSE;
+		$category_id=NULL;
+		
 		while ($everythig_deleted == FALSE) {
 			$i = $i + 1;
 			if ($stmt = self::connection()->prepare("SELECT category_id, name, catype_id FROM category WHERE id = ?")) {
@@ -326,7 +344,7 @@ class DB{
 				$stmt->close();
 			}
 
-			if ($category_id == NULL) {
+			if (count($category_id)<1) {
 				$everythig_deleted = TRUE;
 			}
 			else {
@@ -360,6 +378,9 @@ class DB{
 
 		$i = 0;
 		$everythig_deleted = FALSE;
+		$catype_id=NULL;
+		$cat_id=array();
+		
 		while ($everythig_deleted == FALSE) {
 			$i = $i + 1;
 			if ($stmt = self::connection()->prepare("SELECT catype_id, name, allows_multiple FROM catype WHERE id = ?")) {
@@ -370,7 +391,7 @@ class DB{
 				$stmt->close();
 			}
 
-			if ($catype_id == NULL) {
+			if (count($catype_id)<1) {
 				$everythig_deleted = TRUE;
 			}
 			else {
@@ -411,6 +432,9 @@ class DB{
 	{
 
 		// Fetch all categories of a product. use product_has_category
+		
+		$prod_id=NULL;
+		$cat_ids=array();
 
 		if ($stmt = self::connection()->prepare("SELECT product_id, category_id FROM product_has_category WHERE product_id = ?")) {
 			$stmt->bind_param("i", $product_id);
@@ -425,7 +449,7 @@ class DB{
 			$stmt->close();
 		}
 
-		if ($prod_id == NULL) {
+		if (count($prod_id)<1) {
 			return FALSE;
 		}
 		else {
@@ -445,7 +469,7 @@ class DB{
 		
 		if($categoryIdArray==NULL || count($categoryIdArray)==0){
 			//print("reuturning empty array");
-			return [];
+			return array();
 		}else{
 			//print("reuturning non- empty array");
 			$number_of_categories = sizeof($categoryIdArray);
@@ -499,7 +523,8 @@ class DB{
 	  //print_r($categoryNames);
 	  //echo $allows_multiple;
 	  
-	 
+	 $catype_id=NULL;
+	 $categories_ids=array();
 	  
 	if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype WHERE name = ?")) {
 				$stmt->bind_param("s", $catype_name);
@@ -510,11 +535,13 @@ class DB{
 			}
 	
 	
-			if ($catype_id==NULL){
+			if (count($catype_id)<1){
 				//(1.2) Si no la hay, entonces, se crea una entrada de la tabla catype con
 		//         name=$catypeName, se obtiene su id de insercion, digamos $id, y al igual que
 		//         en (1.1), se agregan entradas a la tabla category con "name" tomados del
 		//         array $categoryNames, y con catype_id=$id
+		
+		
 		
 		if ($stmt = self::connection()->prepare("INSERT INTO catype (name, allows_multiple) VALUES (? ,?)")) {
 			$stmt->bind_param("si", $name, $allows_multiple);
@@ -531,7 +558,7 @@ class DB{
 					//(1.1) Si la hay, se obtiene el id, digamos $id, y se agregan entradas a la tabla
 		//         category con "name" tomados del array $categoryNames, y con catype_id=$id
 		
-		if ($categoryNames==NULL){
+		if (count($categoryNames)<1){
 		return NULL;	
 		}
 	    else{
@@ -556,15 +583,15 @@ class DB{
 			}
 
 		// Return the la funcion = array de todos los ids de insercion obtenidos.
-		
-		
-				
+						
 		//-------------
-	
-	
+
 	        
 	public static function getAllCatypes(){
 		//Devuelve todas las catypes existentes. Toda la tabla catype.
+		
+		$id_array = array();
+        $array_con_todo = array();
 		
 		if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype")) {
 			//$stmt->bind_param(,);
@@ -583,7 +610,7 @@ class DB{
 		}
 		
 		
-		if ($id_array==NULL){
+		if (count($id_array)<1){
 		$result=NULL;
 		}
 		else{
@@ -601,6 +628,9 @@ class DB{
 	public static function getAllCategoriesWithCatypeId($catype_id){
 		//Devuelve todas las categories que tengan ese catype_id
 		
+		$id_array = array();
+        $array_con_todo = array();
+		
 	  if ($stmt = self::connection()->prepare("SELECT id, name, catype_id FROM category WHERE catype_id = ?")) {
 			$stmt->bind_param("i",$catype_id);
 			$stmt->execute();
@@ -612,27 +642,28 @@ class DB{
 				$array_con_todo[$i] = array("id"=>$category_id, "name"=>$name, "catype_id"=>$catype_id);
 				
 				$i = $i + 1;
+				
 			}
 
 			$stmt->close();
 		}
 		
-		
-		if ($id_array==NULL){
+		if (count($id_array)<1){
 		$result=NULL;
-		
 		}
 		else{
 		$result = $array_con_todo;
 		}
 		
-		
 		return $result;		
-		
 	}
+	
 	
 	public static function getAllProducts(){
 		//Tabla product
+		
+		$id_array = array();
+        $array_con_todo = array();
 		
 		if ($stmt = self::connection()->prepare("SELECT id,name,description,price FROM product")) {
 			//$stmt->bind_param(,);
@@ -651,7 +682,7 @@ class DB{
 		}
 		
 		
-		if ($id_array==NULL){
+		if (count($id_array)<1){
 		$result=NULL;
 	
 		}

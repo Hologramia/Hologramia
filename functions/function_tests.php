@@ -67,9 +67,13 @@ require_once('functions.php');
 
 //print_r(DB::getAllProducts());
 
-$catego=array("rojo");
+//$catego=array("rojo");
 
-print_r(DB::insertCategories("color",$catego,"1"));
+//print_r(DB::insertCategories("color",$catego,"1"));
+
+$i=NULL;
+count($i);
+echo count($i);
 
 
 ?>
