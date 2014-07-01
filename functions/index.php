@@ -155,8 +155,8 @@
 	
 	<?php
 	
-		/*if ($_GET["do"]=="yes"){
-		
+		//if ($_GET["do"]=="yes"){
+		/*
 			print("<br/>inserting...");
 			$insert_id = DB::insertProduct("perro","perro bonito",400.0);
 			print("<br/>insert id:");
@@ -173,8 +173,13 @@
 			$result = DB::removeProductWithId($insert_id);
 			print("<br/>got:");
 			var_dump($result);
+			*/
 			
-		}*/
+			/*
+			var_dump(DB::insertCategories("Color",array("Morado","Naranja"),TRUE));
+			
+			print("inserted!!!");*/
+		//}
 	
 	?>
 	

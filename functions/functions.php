@@ -110,74 +110,23 @@ class DB{
 
 	public static function insertCategories($catype_name, $categoryNames, $allows_multiple)
 	{
-		//( 1 ) Primero se verifica si ya existe una entrada en la tabla catype que tenga
-		//         name=$catypename.
-		//(1.1) Si la hay, se obtiene el id, digamos $id, y se agregan entradas a la tabla
-		//         category con "name" tomados del array $categorynames, y con catype_id=$id
-		// Return the la funcion = array de todos los ids de insercion obtenidos.
-       //-------------
-	  //echo $catype_name;
-	  //print_r($categoryNames);
-	  //echo $allows_multiple;
-	  
-	 $catype_id=NULL;
-	 $categories_ids=array();
-	  
-	if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype WHERE name = ?")) {
-				$stmt->bind_param("s", $catype_name);
-				$stmt->execute();
-				$stmt->bind_result($catype_id, $name, $allows_m);
-				$stmt->fetch();
-				$stmt->close();
+		print("inserting...");
+		$insertionIds = array();
+		print("inserting...");
+		if (!($existingCatype = DB::getUniqueValue("catype",array("id"),"name=?",array($catype_name)))){
+			$existingCatype = array("id"=>(DB::insertCategoryType($catype_name,$allos_multiple)));
+		}
+		print("inserting...");
+		$catype_id = $existingCatype["id"];
+		print("inserting...");
+		foreach($categoryNames as $value){
+			if ($inserted = DB::insertCategory($value,$catype_id)){
+				$insertionIds[] = $inserted;
 			}
-	
-	
-			if (count($catype_id)<1){
-				//(1.2) Si no la hay, entonces, se crea una entrada de la tabla catype con
-		//         name=$catypeName, se obtiene su id de insercion, digamos $id, y al igual que
-		//         en (1.1), se agregan entradas a la tabla category con "name" tomados del
-		//         array $categoryNames, y con catype_id=$id
-		
-		
-		
-		if ($stmt = self::connection()->prepare("INSERT INTO catype (name, allows_multiple) VALUES (? ,?)")) {
-			$stmt->bind_param("si", $name, $allows_multiple);
-			$stmt->execute();
-			$stmt->close();
 		}
-
-		$catype_id = mysqli_insert_id(self::connection());
-		return $catype_id;
-								
-			}
-			 
-				
-					//(1.1) Si la hay, se obtiene el id, digamos $id, y se agregan entradas a la tabla
-		//         category con "name" tomados del array $categoryNames, y con catype_id=$id
-		
-		if (count($categoryNames)<1){
-		return NULL;	
-		}
-	    else{
-			
-		
-		$number_of_categories=sizeof($categoryNames);
-		
-		//echo $number_of_categories;
-		
-		for ($i=0;$i<=$number_of_categories-1;$i=$i+1){
-		
-			$categories_ids[$i]=self::insertCategory($categoryNames[$i], $catype_id);
-			
-		//print_r($categories_ids);
-			
-		}
-				
-		return $categories_ids;
-		
-		}
-				
-			}
+		print("inserting...");
+		return $insertionIds;
+	}
 
 		// Return the la funcion = array de todos los ids de insercion obtenidos.
 						
