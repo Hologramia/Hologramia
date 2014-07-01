@@ -1,513 +1,110 @@
 
 <?php
 class DB{
-	public static $connection = NULL;
 
-	public static function connection()
-	{
-		if (self::$connection != NULL) {
-			return self::$connection;
-		}
 
-		$con = new mysqli("localhost", "root", "", "hologramia_schema");
-		if ($con->connect_errno) {
-			$con = new mysqli("localhost", "root", "123", "hologramia_schema");
-			if ($con->connect_errno) {
-				echo "Failed to connect to MySQL: (" . $con->connect_errno . ") " . $con->connect_error;
-				self::$connection = NULL;
-				return self::$connection;
-			}
-		}
-
-		self::$connection = $con;
-		return $con;
-	}
-
-	// JUSTO:
-	// For every query that you do, please use the following syntax:
-	// mysql_query( $yourQuery , DB::connection());
-	// Don't worry, this doesn't mean the connection is performed again and again
-	// every time.
-	// If you read the function above, you will see it is not performed every time.
+//High level functions
 
 	public static function insertProduct($name, $description, $price)
 	{
-
-		// JUSTO:
-		// Add product to database table
-		// Return the insertion id using this: http://www.php.net//manual/en/function.mysql-insert-id.php
-
-		if ($stmt = self::connection()->prepare("INSERT INTO product (name, description, price) VALUES (?, ?, ?)")) {
-			$stmt->bind_param("ssd", $name, $description, $price);
-			$stmt->execute();
-			$stmt->close();
-		}
-
-		$product_id = mysqli_insert_id(self::connection());
-		return $product_id;
+		return DB::insertValues("product",array("name"=>$name,"description"=>$description,"price"=>$price));
 	}
 
 	public static function getProductById($id)
 	{
-
-		// JUSTO:
-		// This function must read from the products table and return the product having
-		// this id. If the product is not found, then it returns NULL
-		// $result=mysql_query("SELECT * FROM product WHERE id=".$id.";", DB::connection());
-		// return mysql_fetch_row($result);
-
-        $id = NULL;
-	    $name = NULL;
-        
-		if ($stmt = self::connection()->prepare("SELECT id,name,description,price FROM product WHERE id = ?")) {
-			$stmt->bind_param("i", $id);
-			$stmt->execute();
-			$stmt->bind_result($id, $name, $description, $price);
-			$stmt->fetch();
-			$stmt->close();
-		}
-			if (count($id)<1 || count($name)<1) {
-				return NULL;
-			}
-			else {
-				return array(
-					"id" => $id,
-					"name" => $name,
-					"description" => $description,
-					"price" =>$price
-				);
-			}
-		
-		
+		return DB::getUniqueValue("product",array(),"id=?",array($id));
 	}
 
 	public static function insertUser($name, $identifier, $password)
 	{
-
-		// JUSTO: Insert user, return the insert id as in insertProduct();
-		// $result=mysql_query( "INSERT INTO user (name, identifier, password) VALUES ("."'".$name."'"." ,"."'".$identifier."'"." ,"."'".$password."'".")" , DB::connection());
-
-		if ($stmt = self::connection()->prepare("INSERT INTO user (name, identifier, password) VALUES (? ,?, ?)")) {
-			$stmt->bind_param("sss", $name, $identifier, $password);
-			$stmt->execute();
-			$stmt->close();
-		}
-
-		$user_id = mysqli_insert_id(self::connection());
-		return $user_id;
+		return DB::insertValues("user",array("name"=>$name,"identifier"=>$identifier,"password"=>$password));
 	}
 
 	public static function getUserById($id)
 	{
-		$id = NULL;
-		$name = NULL;
-		
-		if ($stmt = self::connection()->prepare("SELECT id, name, identifier, password FROM user WHERE id = ?")) {
-			$stmt->bind_param("i", $id);
-			$stmt->execute();
-			$stmt->bind_result($id, $name, $identifier, $password);
-			$stmt->fetch();
-			$stmt->close();
-		}
-			if (count($id)<1 || count($name)<1) {
-				return NULL;
-			}
-			else {
-				return array(
-					"id" => $id,
-					"name" => $name,
-					"identifier" => $identifier,
-					"password" => $password
-				);
-			}
-		
+		return DB::getUniqueValue("user",array(),"id=?",array($id));
 	}
 
 	public static function insertCategoryType($name, $allows_multiple)
 	{
-
-		// JUSTO: A "category type" is something like "Color, Size, Gender"
-		// This is NOT the same as a "category", which would be something like "Red, 15, Male"
-		// Do not edit this function unless this is clear.
-		// This function inserts into the table catype.
-		// $allows_multiple is a boolean (true or false).
-		// In MySQL this is a TINYINT(1) (1 or 0). This means whether a product is allowed
-		// to have multiple categories in this category type. For example: A product cannot have
-		// multiple "Size" (talla), but it can have multiple "Color".
-
-		if ($stmt = self::connection()->prepare("INSERT INTO catype (name, allows_multiple) VALUES (? ,?)")) {
-			$stmt->bind_param("si", $name, $allows_multiple);
-			$stmt->execute();
-			$stmt->close();
-		}
-
-		$catype_id = mysqli_insert_id(self::connection());
-		return $catype_id;
+		return DB::insertValues("catype",array("name"=>$name,"allows_multiple"=>$allows_multiple));
 	}
 
 	public static function getCategoryTypeById($id)
 	{
-		$id = NULL; 
-		$name = NULL;
-		$allows_multiple=NULL;
-		
-		if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype WHERE id = ?")) {
-			$stmt->bind_param("i", $id);
-			$stmt->execute();
-			$stmt->bind_result($id, $name, $allows_multiple);
-			$stmt->fetch();
-			$stmt->close();
-		    }
-			
-			if (count($id)<1 || count($name)<1) {
-				return NULL;
-			}
-			else {
-				return array(
-					"id" => $id,
-					"name" => $name,
-					"allows_multiple" => $allows_multiple
-				);
-			}
-			
+		return DB::getUniqueValue("catype",array(),"id=?",array($id));	
 	}
 
 	public static function insertCategory($name, $catype_id)
 	{
-		if ($stmt = self::connection()->prepare("INSERT INTO category (name, catype_id) VALUES (? ,?)")) {
-			$stmt->bind_param("si", $name, $catype_id);
-			$stmt->execute();
-			$stmt->close();
-		}
-
-		$category_id = mysqli_insert_id(self::connection());
-		return $category_id;
+		return DB::insertValues("category",array("name"=>$name,"catype_id"=>$catype_id));
 	}
 
 	public static function getCategoryById($id)
 	{
-		$id=NULL;
-		$name=NULL;
-		$catype_id=NULL;
-		
-		if ($stmt = self::connection()->prepare("SELECT id, name, catype_id FROM category WHERE id = ?")) {
-			$stmt->bind_param("i", $id);
-			$stmt->execute();
-			$stmt->bind_result($id, $name, $catype_id);
-			$stmt->fetch();
-			$stmt->close();
-		}
-			
-			if (count($id)<1 || count($name)<1) {
-				return NULL;
-			}else{
-				return array(
-					"id" => $id,
-					"name" => $name,
-					"catype_id" => $catype_id
-				);
-			}
-			
+		return DB::getUniqueValue("category",array(),"id=?",array($id));
 	}
 
 	public static function addCategoryToProduct($product_id, $category_id)
 	{
-
-		// In case this is not clear yet: category_id is the id of a
-		// category, not of a catype. Make sure you understand the difference
-		// between these two.
-		// HOW TO MAKE THIS FUNCTION: Insert these values into the table product_has_category
-		
-		$product_id = NULL;
-		$category_id = NULL;
-
-		if ($stmt = self::connection()->prepare("INSERT INTO product_has_category (product_id, category_id) VALUES (? ,?)")) {
-			$stmt->bind_param("ii", $product_id, $category_id);
-			$stmt->execute();
-			$stmt->close();
-		}
-
-		if ($stmt = self::connection()->prepare("SELECT product_id, name, description, price FROM product WHERE id = ?")) {
-			$stmt->bind_param("i", $product_id);
-			$stmt->execute();
-			$stmt->bind_result($product_id, $name, $description, $price);
-			$stmt->fetch();
-			$stmt->close();
-		}
-
-		if ($stmt = self::connection()->prepare("SELECT category_id, name, catype_id FROM category WHERE id = ?")) {
-			$stmt->bind_param("i", $category_id);
-			$stmt->execute();
-			$stmt->bind_result($category_id, $name, $catype_id);
-			$stmt->fetch();
-			$stmt->close();
-		}
-
-		if (count($product_id)<1 OR count($category_id)<1) {
-			return FALSE;
-		}
-		else {
+		DB::insertValues("product_has_category",array("product_id"=>$product_id,"category_id"=>$category_id));
+		if(DB::getUniqueValue("product_has_category",array(),"product_id=? AND category_id=?",array($product_id,$category_id))){
 			return TRUE;
 		}
-
-		// $product_has_category_id=mysqli_insert_id(self::connection());
-		// return $product_has_category_id;
-
+		return FALSE;
 	}
 
 	public static function removeProductWithId($id)
 	{
-		// This should also remove all entries in product_has_category with this product_id
-
-		$i = 0;
-		$everythig_deleted = FALSE;
-		$product_id = NULL;
-		while ($everythig_deleted == FALSE) {
-			$i = $i + 1;
-			if ($stmt = self::connection()->prepare("SELECT product_id, name, description, price FROM product WHERE id = ?")) {
-				$stmt->bind_param("i", $id);
-				$stmt->execute();
-				$stmt->bind_result($product_id, $name, $description, $price);
-				$stmt->fetch();
-				$stmt->close();
-			}
-
-			if (count($product_id)<1) {
-				$everythig_deleted = TRUE;
-			}
-			else {
-				if ($stmt = self::connection()->prepare("DELETE FROM product WHERE id = ?")) {
-					$stmt->bind_param("i", $id);
-					$stmt->execute();
-					$stmt->close();
-				}
-
-				if ($stmt = self::connection()->prepare("DELETE FROM product_has_category WHERE product_id = ?")) {
-					$stmt->bind_param("i", $id);
-					$stmt->execute();
-					$stmt->close();
-				}
-			}
-		}
-
-		if ($i == 1) {
-			return FALSE;
-		}
-		else {
-			return TRUE;
-		}
+		return (
+					DB::removeValues("product_has_category","product_id=?",array($id))
+					&& DB::removeValues("product","id=?",array($id))
+				);
 	}
 
 	public static function removeUserWithId($id)
 	{
-
-		$user_id = NULL;
-
-		if ($stmt = self::connection()->prepare("SELECT user_id, name, identifier, password FROM user WHERE id = ?")) {
-			$stmt->bind_param("i", $id);
-			$stmt->execute();
-			$stmt->bind_result($user_id, $name, $identifier, $password);
-			$stmt->fetch();
-			$stmt->close();
-		}
-
-		if (count($user_id)<1) {
-			return FALSE;
-		}
-		else {
-			if ($stmt = self::connection()->prepare("DELETE FROM user WHERE id = ?"))            {
-				$stmt->bind_param("i", $user_id);
-				$stmt->execute();
-				$stmt->close();
-			}
-
-			return TRUE;
-		}
+		return DB::removeValues("user","id=?",array($id));
 	}
 
 	public static function removeCategoryWithId($id)
 	{
 
-		// This should also remove all entries in product_has_category with those category_id
-
-		$i = 0;
-		$everythig_deleted = FALSE;
-		$category_id=NULL;
-		
-		while ($everythig_deleted == FALSE) {
-			$i = $i + 1;
-			if ($stmt = self::connection()->prepare("SELECT category_id, name, catype_id FROM category WHERE id = ?")) {
-				$stmt->bind_param("i", $id);
-				$stmt->execute();
-				$stmt->bind_result($category_id, $name, $catype_id);
-				$stmt->fetch();
-				$stmt->close();
-			}
-
-			if (count($category_id)<1) {
-				$everythig_deleted = TRUE;
-			}
-			else {
-				if ($stmt = self::connection()->prepare("DELETE FROM category WHERE id = ?")) {
-					$stmt->bind_param("i", $id);
-					$stmt->execute();
-					$stmt->close();
-				}
-
-				if ($stmt = self::connection()->prepare("DELETE FROM product_has_category WHERE category_id = ?")) {
-					$stmt->bind_param("i", $id);
-					$stmt->execute();
-					$stmt->close();
-				}
-			}
-		}
-
-		if ($i == 1) {
-			return FALSE;
-		}
-		else {
-			return TRUE;
-		}
+		return (
+					DB::removeValues("product_has_category","category_id=?",array($id))
+					&& DB::removeValues("category","id=?",array($id))
+				);
 	}
 
 	public static function removeCatypeWithId($id)
 	{
 
-		// This should also remove all categories with this catype_id
-		// And subsequently, all entries in product_has_category with those category_id
-
-		$i = 0;
-		$everythig_deleted = FALSE;
-		$catype_id=NULL;
-		$cat_id=array();
-		
-		while ($everythig_deleted == FALSE) {
-			$i = $i + 1;
-			if ($stmt = self::connection()->prepare("SELECT catype_id, name, allows_multiple FROM catype WHERE id = ?")) {
-				$stmt->bind_param("i", $id);
-				$stmt->execute();
-				$stmt->bind_result($catype_id, $name, $allows_multiple);
-				$stmt->fetch();
-				$stmt->close();
-			}
-
-			if (count($catype_id)<1) {
-				$everythig_deleted = TRUE;
-			}
-			else {
-				if ($stmt = self::connection()->prepare("DELETE FROM catype WHERE id = ?")) {
-					$stmt->bind_param("i", $id);
-					$stmt->execute();
-					$stmt->close();
-				}
-
-				if ($stmt = self::connection()->prepare("SELECT category_id, name, catype_id FROM category WHERE catype_id = ?")) {
-					$stmt->bind_param("i", $catype_id);
-					$stmt->execute();
-					$stmt->bind_result($category_id, $name, $catype_id);
-					$k = 0;
-					while ($stmt->fetch()) {
-						$cat_id[$k] = strval($category_id);
-						$k = $k + 1;
-					}
-
-					$stmt->close();
-				}
-
-				for ($kk = 0; $kk < $k; $kk = $kk + 1) {
-					DB::removeCategoryWithId($cat_id[$kk]);
-				}
-			}
-		}
-
-		if ($i == 1) {
-			return FALSE;
-		}
-		else {
-			return TRUE;
-		}
+		return (
+					DB::removeValues("category","catype_id=?",array($id))
+					&& DB::removeValues("catype","id=?",array($id))
+				);
 	}
 
 	public static function getCategoryIdsForProduct($product_id)
 	{
-
-		// Fetch all categories of a product. use product_has_category
-		
-		$prod_id=NULL;
-		$cat_ids=array();
-
-		if ($stmt = self::connection()->prepare("SELECT product_id, category_id FROM product_has_category WHERE product_id = ?")) {
-			$stmt->bind_param("i", $product_id);
-			$stmt->execute();
-			$stmt->bind_result($prod_id, $category_id);
-			$i = 0;
-			while ($stmt->fetch()) {
-				$cat_ids[$i] = $category_id;
-				$i = $i + 1;
-			}
-
-			$stmt->close();
-		}
-
-		if (count($prod_id)<1) {
-			return FALSE;
-		}
-		else {
-			return $cat_ids;
-		}
+		return DB::getValues("product_has_category",array(),"id=?",array($id));
 	}
 	
 	public static function getProducts($categoryIdArray,$resultLimit,$resultOffset)
 	{
-		//$categoryIdArray is an array of category id's
-		//Esto puede ser un poquito complicado desde el punto de vista logico pero tu eres bien inteligente.
-		//Creo que el truco es usar EXISTS un verguero de veces: http://dev.mysql.com/doc/refman/5.0/en/exists-and-not-exists-subqueries.html
-		//En resumen va a ser asi: SELECT * FROM product WHERE EXISTS(...) AND EXISTS(...) AND ...
-		//Donde hay un exist por cada categoris, y ese EXIST es un SELECT de product_has_category
-		//No lo tengo totalmente resuelto en mi mente, pero tu seguramente puedes figure it out tan rapido
-		//como yo. Echale machete pues.
+		$numCategories = count($categoryIdArray);
+		$whereText = "1";
+		for ($i=0;$i<$numCategories;$i+=1){
+			$where_i = "EXISTS (SELECT * FROM product_has_category AS table$i WHERE table$i.product_id=product.id AND table$i.category_id=?)";
+			if ($i==0){
+				$whereText = $where_i;
+			}else{
+				$whereText = $whereText." AND ".$where_i;
+			}
+		}
+		$whereText = $whereText." LIMIT $resultOffset,$resultLimit";
 		
-		if($categoryIdArray==NULL || count($categoryIdArray)==0){
-			//print("reuturning empty array");
-			return array();
-		}else{
-			//print("reuturning non- empty array");
-			$number_of_categories = sizeof($categoryIdArray);
-			$sql_statement= "SELECT product_id, category_id FROM product_has_category AS table1 WHERE category_id = ?";
-			for($i=1;$i<=$number_of_categories-1;$i=$i+1){
-				$sql_statement=$sql_statement." AND EXISTS (SELECT product_id, category_id FROM product_has_category AS table".strval($i+1)." WHERE category_id = ? AND table".strval($i).".product_id = table".strval($i+1).".product_id";
-			}
-		}
-			
-		$type = "i";
-		for($i=1;$i<=$number_of_categories-1;$i=$i+1){
-			$sql_statement=$sql_statement.")";
-			$type = $type."i";
-		}
-		
-		function refValues($arr){ 
-			$refs = array();
-	
-			foreach ($arr as $key => $value){
-				$refs[$key] = &$arr[$key]; 
-			}
-	
-			return $refs;
-		}
-			
-		if ($stmt = self::connection()->prepare($sql_statement)) {
-			$param = $categoryIdArray;
-			call_user_func_array('mysqli_stmt_bind_param', array_merge(array($stmt, $type),refValues($categoryIdArray)));
-			$stmt->execute();
-			$stmt->bind_result($product_id, $category_id);
-			$i = 0;
-			while ($stmt->fetch()) {
-				$prod_ids[$i] = $product_id;
-				echo $product_id;
-				$i = $i + 1;
-			}
-			$stmt->close();
-		}
+		return DB::getValues("product",array(),$whereText,$categoryIdArray);
 	}
 	
 
@@ -695,6 +292,234 @@ class DB{
 		return $result;		
 		
 	}
+
+
+// Helper functions
+
+	public static function getUniqueValue($tableName,$valueArray,$whereStatement,$whereValues){
+		$result = DB::getValues($tableName,$valueArray,$whereStatement,$whereValues);
+		
+		if ($result && count($result)==1){
+			return $result[0];
+		}else{
+			return FALSE;
+		}
+	}
+
+
+// Low level functions
+
+
+	public static $connection = NULL;
+	
+	public static function connection()
+	{
+		if (self::$connection != NULL) {
+			return self::$connection;
+		}
+
+		$con = new mysqli("localhost", "root", "", "hologramia_schema");
+		if ($con->connect_errno) {
+			$con = new mysqli("localhost", "root", "123", "hologramia_schema");
+			if ($con->connect_errno) {
+				echo "Failed to connect to MySQL: (" . $con->connect_errno . ") " . $con->connect_error;
+				self::$connection = NULL;
+				return self::$connection;
+			}
+		}
+
+		self::$connection = $con;
+		return $con;
+	}
+	
+	public static function insertValues($tableName,$valueArray){
+	
+		$types = "";
+		$keys = array_keys($valueArray);
+		$values = array_values($valueArray);
+		$refValues = array();
+		$numKeys = count($keys);
+		
+		for ($i = 0; $i<$numKeys; $i+=1){
+		
+			$refValues[] = &$values[$i];
+		
+			if ($i==0){
+				$questionMarks = "?";
+			}else{
+				$questionMarks = $questionMarks.",?";
+			}
+			
+			switch(gettype($values[$i])){
+				case "integer":
+				case "boolean":
+					$types = $types."i";
+					break;
+				case "double":
+					$types = $types."d";
+					break;
+				default:
+					$types = $types."s";
+			}
+			
+		}
+		
+		$statementText = "INSERT INTO $tableName (".implode(",",$keys).") VALUES ($questionMarks)";
+		
+		if ($stmt = self::connection()->prepare($statementText)){
+			call_user_func_array(mysqli_stmt_bind_param,array_merge(array(&$stmt,&$types),$refValues));
+			$stmt->execute();
+			$stmt->close();
+			
+			return mysqli_insert_id(self::connection());
+		}else{
+			return FALSE;
+		}
+	}
+	
+	public static function getValues($tableName,$valueArray,$whereStatement,$whereValues){
+	
+		$values = "*";
+		
+		if ($valueArray != NULL && $valueArray != "*" && count($valueArray)>0){
+			$values = implode(",",$valueArray);
+		}
+		
+		$refWhereValues = array();
+		
+		$numWhereValues = count($whereValues);
+		
+		$whereTypes = "";
+		
+		for ($i = 0; $i<$numWhereValues; $i+=1){
+		
+			$refWhereValues[] = &$whereValues[$i];
+			
+			switch(gettype($whereValues[$i])){
+				case "integer":
+				case "boolean":
+					$whereTypes = $whereTypes."i";
+					break;
+				case "double":
+					$whereTypes = $whereTypes."d";
+					break;
+				default:
+					$whereTypes = $whereTypes."s";
+			}
+			
+		}
+		
+		$statementText = "SELECT $values FROM $tableName WHERE $whereStatement";
+		
+		/*print("<br/>STATEMENT:<br/>");
+			
+		var_dump($statementText);
+			
+		print("<br/>TYPES:<br/>");
+			
+		var_dump($whereTypes);
+			
+		print("<br/>VALUES:<br/>");
+			
+		var_dump($refWhereValues);
+			
+		print("<br/>");*/
+		
+		
+		if ($stmt = self::connection()->prepare($statementText)){
+			
+			call_user_func_array(mysqli_stmt_bind_param,array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
+			
+			
+			
+			$stmt->execute();
+			
+			$data = mysqli_stmt_result_metadata($stmt);
+			
+			$fields = array();
+        	$out = array();
+
+       		while($field = mysqli_fetch_field($data)) {
+       			
+            	$fields[] = &$out[$field->name];
+        	}
+        	
+        	
+        	
+        	call_user_func_array(mysqli_stmt_bind_result,array_merge(array(&$stmt),$fields));
+			
+			$result = array();
+			while($stmt->fetch()){
+				//print("<br/>FETCHED OUT:<br/>");
+				
+				//var_dump($out);
+				
+				$result[] = DB::dereference($out);
+			}
+			
+			$stmt->close();
+			
+			return $result;
+			
+		}else{
+			return FALSE;
+		}
+	}
+	
+	public static function removeValues($tableName,$whereStatement,$whereValues){
+	
+		$refWhereValues = array();
+		
+		$numWhereValues = count($whereValues);
+		
+		$whereTypes = "";
+		
+		for ($i = 0; $i<$numWhereValues; $i+=1){
+		
+			$refWhereValues[] = &$whereValues[$i];
+			
+			switch(gettype($whereValues[$i])){
+				case "integer":
+				case "boolean":
+					$whereTypes = $whereTypes."i";
+					break;
+				case "double":
+					$whereTypes = $whereTypes."d";
+					break;
+				default:
+					$whereTypes = $whereTypes."s";
+			}
+			
+		}
+		
+		$statementText = "DELETE FROM $tableName WHERE $whereStatement";
+		
+		
+		if ($stmt = self::connection()->prepare($statementText)){
+			
+			call_user_func_array(mysqli_stmt_bind_param,array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
+			
+			$stmt->execute();
+			
+			return TRUE;
+			
+		}else{
+			return FALSE;
+		}
+	}
+	
+	
+// General hepers
+
+	public static function dereference($x){
+		$y = array();
+		foreach($x as $key=>$value){
+			$y[$key] = $value;
+		}
+		return $y;
+	}
+	
+	
 }
 
 ?>

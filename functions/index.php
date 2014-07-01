@@ -1,5 +1,7 @@
 <?php
 
+	error_reporting(E_ALL);
+
 	require_once('functions.php');
 ?>
 
@@ -13,7 +15,7 @@
 	<form>
 
 <?php
-
+	
 	$catypes = DB::getAllCatypes();
 	
 	$num_catypes = count($catypes);
@@ -36,10 +38,10 @@
 			for ($j=0;$j<$num_categories;$j+=1){
 ?>
 
-		<input type="checkbox" name="cat<?php print($catypes[$i]["id"]); ?>" value="<?php print($categories[$j]["id"]); ?>"<?php
+		<input type="checkbox" name="c<?php print($categories[$j]["id"]); ?>" value="1"<?php
 		
-			if (array_key_exists("cat".$catypes[$i]["id"],$_GET)){
-				print(($_GET["cat".$catypes[$i]["id"]].""==$categories[$j]["id"]."")?" checked":"");
+			if (array_key_exists("c".$categories[$j]["id"],$_GET)){
+				print(" checked");
 			}
 			
 		?>/><?php print($categories[$j]["name"]); ?><br/>
@@ -51,10 +53,10 @@
 			
 ?>
 			
-		<input type="radio" name="cat<?php print($catypes[$i]["id"]); ?>" value=""<?php
+		<input type="radio" name="ct<?php print($catypes[$i]["id"]); ?>" value=""<?php
 		
-			if (array_key_exists("cat".$catypes[$i]["id"],$_GET)){
-				print(($_GET["cat".$catypes[$i]["id"]].""=="")?" checked":"");
+			if (array_key_exists("ct".$catypes[$i]["id"],$_GET)){
+				print(($_GET["ct".$catypes[$i]["id"]].""=="")?" checked":"");
 			}else{
 				print(" checked");
 			}
@@ -70,10 +72,10 @@
 			for ($j=0;$j<$num_categories;$j+=1){
 ?>
 
-		<input type="radio" name="cat<?php print($catypes[$i]["id"]); ?>" value="<?php print($categories[$j]["id"]); ?>"<?php
+		<input type="radio" name="ct<?php print($catypes[$i]["id"]); ?>" value="<?php print($categories[$j]["id"]); ?>"<?php
 		
-			if (array_key_exists("cat".$catypes[$i]["id"],$_GET)){
-				print(($_GET["cat".$catypes[$i]["id"]].""==$categories[$j]["id"]."")?" checked":"");
+			if (array_key_exists("ct".$catypes[$i]["id"],$_GET)){
+				print(($_GET["ct".$catypes[$i]["id"]].""==$categories[$j]["id"]."")?" checked":"");
 			}
 		
 		?>/><?php print($categories[$j]["name"]); ?><br/>
@@ -105,26 +107,35 @@
 	
 	foreach ($_GET as $key => $value) {
 		if ($key){
-			if (substr($key,0,3) === "cat") {
-     			$id = substr($key,3)+0;
+			if (substr($key,0,2) === "ct") {
+     			$id = substr($key,2)+0;
      			$catype = DB::getCategoryTypeById($id);
      			if ($catype != NULL){
      				$category = DB::getCategoryById($value);
-     				if ($category != NULL){
+     				if ($category){
      					if ($category["catype_id"]==$catype["id"]){
-     						array_push($categoryIdArray,$id);
+     						array_push($categoryIdArray,$category["id"]);
+     						//print("<br/>added:$id.<br/>");
      					}else{
-     						print("bad category match.");
+     						print("<br/>bad category match.<br/>");
      					}
      				}
+     			}
+			}elseif (substr($key,0,1) === "c"){
+				$id = substr($key,1)+0;
+     			$category = DB::getCategoryById($value);
+     			if ($category){
+     				array_push($categoryIdArray,$id);
+     				//print("<br/>added:$id.<br/>");
      			}
 			}
 		}
 	}
 	
+	//var_dump($categoryIdArray);
 	$products = DB::getProducts($categoryIdArray,100,0);
 	
-	
+	//var_dump($products);
 	
 	$num_products = count($products);
 	
@@ -132,7 +143,7 @@
 		
 ?>
 
-	<p><b>[<?php print($products[$i]["id"]); ?>]</b> <?php print($products[$i]["name"]); ?></p>
+	<p><b>[<?php print($products[$i]["id"]); ?>]</b> <?php print($products[$i]["name"]); ?> (<?php print($products[$i]["description"]); ?>)</p>
 
 <?php
 		
@@ -144,21 +155,26 @@
 	
 	<?php
 	
-		//if ($_GET["do"]=="yes"){
-			//DB::insertProduct("Zapato Pequeño","Muy chiquito este zapato",22.25);
-			//DB::insertProduct("Zapato Grande","Este zapato es gigante",100.1);
-			//$id = DB::insertProduct("Pantalon","Blue jean",10000);
-			//print("insert id: ".$id);
-			//$product = DB::getProductById(3);
-			//var_dump($product);
+		/*if ($_GET["do"]=="yes"){
+		
+			print("<br/>inserting...");
+			$insert_id = DB::insertProduct("perro","perro bonito",400.0);
+			print("<br/>insert id:");
+			var_dump($insert_id);
+			print("<br/>getting...");
+			$object = DB::getProductById($insert_id);
+			print("<br/>got:");
+			var_dump($object);
+			print("<br/>adding category...");
+			$catresult = DB::addCategoryToProduct($insert_id,1);
+			print("<br/>got:");
+			var_dump($catresult);
+			print("<br/>removing...");
+			$result = DB::removeProductWithId($insert_id);
+			print("<br/>got:");
+			var_dump($result);
 			
-			//$catype = DB::insertCategoryType("Talla",FALSE);
-			//print("inserted catype: $catype");
-			
-			//$category = DB::insertCategory("Verde",4);
-			//print("|inserted:");
-			//var_dump($category);
-		//}
+		}*/
 	
 	?>
 	
