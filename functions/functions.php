@@ -316,7 +316,7 @@ class DB{
 		$statementText = "INSERT INTO $tableName (".implode(",",$keys).") VALUES ($questionMarks)";
 		
 		if ($stmt = self::connection()->prepare($statementText)){
-			call_user_func_array(mysqli_stmt_bind_param,array_merge(array(&$stmt,&$types),$refValues));
+			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$types),$refValues));
 			$stmt->execute();
 			$stmt->close();
 			
@@ -377,7 +377,7 @@ class DB{
 		
 		if ($stmt = self::connection()->prepare($statementText)){
 			
-			call_user_func_array(mysqli_stmt_bind_param,array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
+			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
 			
 			
 			
@@ -395,7 +395,7 @@ class DB{
         	
         	
         	
-        	call_user_func_array(mysqli_stmt_bind_result,array_merge(array(&$stmt),$fields));
+        	call_user_func_array("mysqli_stmt_bind_result",array_merge(array(&$stmt),$fields));
 			
 			$result = array();
 			while($stmt->fetch()){
@@ -446,7 +446,7 @@ class DB{
 		
 		if ($stmt = self::connection()->prepare($statementText)){
 			
-			call_user_func_array(mysqli_stmt_bind_param,array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
+			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
 			
 			$stmt->execute();
 			
