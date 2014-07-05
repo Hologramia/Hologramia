@@ -1,5 +1,8 @@
 
 <?php
+
+
+
 class DB{
 
 
@@ -90,7 +93,7 @@ class DB{
 		return DB::getValues("product_has_category",array(),"id=?",array($id));
 	}
 	
-	public static function getProducts($categoryIdArray,$resultLimit,$resultOffset)
+	public static function getProducts($q,$categoryIdArray,$resultLimit,$resultOffset)
 	{
 		$numCategories = count($categoryIdArray);
 		$whereText = "1";
@@ -102,9 +105,9 @@ class DB{
 				$whereText = $whereText." AND ".$where_i;
 			}
 		}
-		$whereText = $whereText." LIMIT $resultOffset,$resultLimit";
+		$whereText = "MATCH (product.name,product.description) AGAINST (? IN BOOLEAN MODE) AND ".$whereText." LIMIT $resultOffset,$resultLimit";
 		
-		return DB::getValues("product",array(),$whereText,$categoryIdArray);
+		return DB::getValues("product",array(),$whereText,array_merge(array($q),$categoryIdArray));
 	}
 	
 
@@ -411,6 +414,7 @@ class DB{
 			return $result;
 			
 		}else{
+			die($statementText."<br/>".self::connection()->error);
 			return FALSE;
 		}
 	}

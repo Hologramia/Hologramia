@@ -1,8 +1,10 @@
 <?php
 
-	error_reporting(E_ALL);
+	//error_reporting(E_ALL);
 
 	require_once('functions.php');
+	
+	//phpinfo();
 ?>
 
 <!DOCTYPE html>
@@ -13,6 +15,12 @@
 	
 	<h2>Par&aacute;metros:</h2>
 	<form>
+	
+	<input type="text" name="q" value="<?php
+		if (array_key_exists("q",$_GET)){
+			print(htmlentities($_GET["q"],ENT_COMPAT | ENT_HTML401,"UTF-8"));
+		}
+	?>">
 
 <?php
 	
@@ -133,7 +141,11 @@
 	}
 	
 	//var_dump($categoryIdArray);
-	$products = DB::getProducts($categoryIdArray,100,0);
+	$q = "";
+	if (array_key_exists("q",$_GET)){
+		$q = $_GET["q"];
+	}
+	$products = DB::getProducts($q,$categoryIdArray,100,0);
 	
 	//var_dump($products);
 	
@@ -154,6 +166,11 @@
 	--
 	
 	<?php
+	
+		//DB::insertProduct("producto primero","un producto muy grande",20.45);
+		//DB::insertProduct("producto SEGUNDO","un producto muy pendejo",200.45);
+		//DB::insertProduct("producto tercero","un producto muy chiquito",201.45);
+		//DB::insertProduct("producto cuarto","un producto muy muy",202.45);
 	
 		//if ($_GET["do"]=="yes"){
 		/*
