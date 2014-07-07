@@ -111,15 +111,17 @@
 	
 <?php
 	
-	$categoryIdArray = [];
+	$categoryIdArray = array();
 	
 	foreach ($_GET as $key => $value) {
 		if ($key){
 			if (substr($key,0,2) === "ct") {
      			$id = substr($key,2)+0;
      			$catype = DB::getCategoryTypeById($id);
-     			if ($catype != NULL){
-     				$category = DB::getCategoryById($value);
+     			//print("found catype: ".$catype["name"]."</br>");
+     			if ($catype){
+     				$category = DB::getCategoryById($value+0);
+     				//print("found category($value): ".$category["name"]."</br>");
      				if ($category){
      					if ($category["catype_id"]==$catype["id"]){
      						array_push($categoryIdArray,$category["id"]);
@@ -131,7 +133,8 @@
      			}
 			}elseif (substr($key,0,1) === "c"){
 				$id = substr($key,1)+0;
-     			$category = DB::getCategoryById($value);
+     			$category = DB::getCategoryById($id+0);
+     			//print("found lonely category($id): ".$category["name"]."</br>");
      			if ($category){
      				array_push($categoryIdArray,$id);
      				//print("<br/>added:$id.<br/>");
@@ -172,7 +175,23 @@
 		//DB::insertProduct("producto tercero","un producto muy chiquito",201.45);
 		//DB::insertProduct("producto cuarto","un producto muy muy",202.45);
 	
-		//if ($_GET["do"]=="yes"){
+		if (array_key_exists("do",$_GET) && $_GET["do"]=="yes"){
+		
+			//DB::insertProduct("un producto bueno","este producto es muy muy bueno",20.23); //8
+			//DB::insertCategories("Color",array("Amarillo","Azul","Morado","Rojo","Verde"),TRUE); //2
+			//$insert_ids = DB::insertCategories("Talla",array("XS","S","M","L","XL","XXL","U"),FALSE);
+			//print("ids:");
+			//var_dump($insert_ids);
+			
+			//DB::insertProduct("otro producto regular","este objeto es mas o menos regular",2000);
+			
+			//DB::insertProduct("producto cualquiera, quien sabe","no tiene nada especial",1000);
+			
+			
+			//DB::addCategoryToProduct(8,8);
+			//DB::addCategoryNameToProduct(8,"amarillo");
+			
+		
 		/*
 			print("<br/>inserting...");
 			$insert_id = DB::insertProduct("perro","perro bonito",400.0);
@@ -196,7 +215,7 @@
 			var_dump(DB::insertCategories("Color",array("Morado","Naranja"),TRUE));
 			
 			print("inserted!!!");*/
-		//}
+		}
 	
 	?>
 	

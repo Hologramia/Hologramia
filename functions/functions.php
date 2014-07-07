@@ -10,12 +10,30 @@ class DB{
 
 	public static function insertProduct($name, $description, $price)
 	{
-		return DB::insertValues("product",array("name"=>$name,"description"=>$description,"price"=>$price));
+		$insert_id = DB::insertValues("product",array("name"=>$name,"description"=>$description,"price"=>$price));
+		DB::updateTextForProduct($insert_id);
+		return $insert_id;
 	}
 
 	public static function getProductById($id)
 	{
 		return DB::getUniqueValue("product",array(),"id=?",array($id));
+	}
+	
+	public static function updateTextForProduct($product_id)
+	{
+		$product = DB::getProductById($product_id);
+		$text = $product["name"]." ".$product["description"];
+		$categoryArray = DB::getCategoryIdsForProduct($product_id);
+		//print("categoryArray: ");
+		//var_dump($categoryArray);
+		$numCategories = count($categoryArray);
+		for ($i=0;$i<$numCategories;$i+=1){
+			$category = DB::getCategoryById($categoryArray[$i]["category_id"]);
+			$text = $text." ".$category["name"];
+		}
+		DB::updateValues("product",array("text"=>$text),"id=?",array($product_id));
+		
 	}
 
 	public static function insertUser($name, $identifier, $password)
@@ -47,14 +65,29 @@ class DB{
 	{
 		return DB::getUniqueValue("category",array(),"id=?",array($id));
 	}
+	
+	public static function getCategoryByName($name)
+	{
+		return DB::getUniqueValue("category",array(),"name=?",array($name));
+	}
 
 	public static function addCategoryToProduct($product_id, $category_id)
 	{
 		DB::insertValues("product_has_category",array("product_id"=>$product_id,"category_id"=>$category_id));
+		DB::updateTextForProduct($product_id);
 		if(DB::getUniqueValue("product_has_category",array(),"product_id=? AND category_id=?",array($product_id,$category_id))){
 			return TRUE;
 		}
 		return FALSE;
+	}
+	
+	public static function addCategoryNameToProduct($product_id,$category_name)
+	{
+		if ($category = DB::getCategoryByName($category_name)){
+			return DB::addCategoryToProduct($product_id,$category["id"]);
+		}else{
+			return;
+		}
 	}
 
 	public static function removeProductWithId($id)
@@ -90,11 +123,14 @@ class DB{
 
 	public static function getCategoryIdsForProduct($product_id)
 	{
-		return DB::getValues("product_has_category",array(),"id=?",array($id));
+		return DB::getValues("product_has_category",array(),"product_id=?",array($product_id));
 	}
 	
 	public static function getProducts($q,$categoryIdArray,$resultLimit,$resultOffset)
 	{
+		//print("valueArray:<br/>");
+		//var_dump($categoryIdArray);
+	
 		$numCategories = count($categoryIdArray);
 		$whereText = "1";
 		for ($i=0;$i<$numCategories;$i+=1){
@@ -105,29 +141,39 @@ class DB{
 				$whereText = $whereText." AND ".$where_i;
 			}
 		}
-		$whereText = "MATCH (product.name,product.description) AGAINST (? IN BOOLEAN MODE) AND ".$whereText." LIMIT $resultOffset,$resultLimit";
 		
-		return DB::getValues("product",array(),$whereText,array_merge(array($q),$categoryIdArray));
+		$valueArray = $categoryIdArray;
+		
+		if ($q != ""){
+			$whereText = "MATCH (product.text) AGAINST (? IN BOOLEAN MODE) AND ".$whereText;
+			$valueArray = array_merge(array($q),$valueArray);
+		}
+		
+		$whereText = $whereText." LIMIT $resultOffset,$resultLimit";
+		
+		
+		
+		return DB::getValues("product",array(),$whereText,$valueArray);
 	}
 	
 
 	public static function insertCategories($catype_name, $categoryNames, $allows_multiple)
 	{
-		print("inserting...");
+		//print("inserting...");
 		$insertionIds = array();
-		print("inserting...");
+		//print("inserting...");
 		if (!($existingCatype = DB::getUniqueValue("catype",array("id"),"name=?",array($catype_name)))){
-			$existingCatype = array("id"=>(DB::insertCategoryType($catype_name,$allos_multiple)));
+			$existingCatype = array("id"=>(DB::insertCategoryType($catype_name,$allows_multiple)));
 		}
-		print("inserting...");
+		//print("inserting...");
 		$catype_id = $existingCatype["id"];
-		print("inserting...");
+		//print("inserting...");
 		foreach($categoryNames as $value){
 			if ($inserted = DB::insertCategory($value,$catype_id)){
 				$insertionIds[] = $inserted;
 			}
 		}
-		print("inserting...");
+		//print("inserting...");
 		return $insertionIds;
 	}
 
@@ -284,6 +330,77 @@ class DB{
 		return $con;
 	}
 	
+	public static function updateValues($tableName,$valueArray,$whereStatement,$whereValues){
+	
+		$types = "";
+		$keys = array_keys($valueArray);
+		$values = array_values($valueArray);
+		$refValues = array();
+		$numKeys = count($keys);
+		
+		for ($i = 0; $i<$numKeys; $i+=1){
+		
+			$refValues[] = &$values[$i];
+		
+			if ($i==0){
+				$questionMarks = "SET ".$keys[$i]."=?";
+			}else{
+				$questionMarks = $questionMarks.", ".$keys[$i]."=?";
+			}
+			
+			switch(gettype($values[$i])){
+				case "integer":
+				case "boolean":
+					$types = $types."i";
+					break;
+				case "double":
+					$types = $types."d";
+					break;
+				default:
+					$types = $types."s";
+			}
+			
+		}
+		
+		$refWhereValues = array();
+		
+		$numWhereValues = count($whereValues);
+		
+		$whereTypes = "";
+		
+		for ($i = 0; $i<$numWhereValues; $i+=1){
+		
+			$refWhereValues[] = &$whereValues[$i];
+			
+			switch(gettype($whereValues[$i])){
+				case "integer":
+				case "boolean":
+					$whereTypes = $whereTypes."i";
+					break;
+				case "double":
+					$whereTypes = $whereTypes."d";
+					break;
+				default:
+					$whereTypes = $whereTypes."s";
+			}
+			
+		}
+		
+		$allTypes = $types.$whereTypes;
+		
+		$statementText = "UPDATE $tableName $questionMarks WHERE $whereStatement";
+		
+		if ($stmt = self::connection()->prepare($statementText)){
+			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$allTypes),$refValues,$refWhereValues));
+			$stmt->execute();
+			$stmt->close();
+			
+			return TRUE;
+		}else{
+			return FALSE;
+		}
+	}
+	
 	public static function insertValues($tableName,$valueArray){
 	
 		$types = "";
@@ -380,7 +497,16 @@ class DB{
 		
 		if ($stmt = self::connection()->prepare($statementText)){
 			
-			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
+			/*print("statement:</br>");
+			var_dump($statementText);
+			print("wheretypes:</br>");
+			var_dump($whereTypes);
+			print("refwherevalues:</br>");
+			var_dump($refWhereValues);*/
+			
+			if (count($refWhereValues)>0){
+				call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
+			}
 			
 			
 			
