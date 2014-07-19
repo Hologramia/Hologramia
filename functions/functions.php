@@ -1,6 +1,136 @@
 
 <?php
 
+class Helper {
+	public static function getArrayValue($array,$key,$default)
+	{
+		if (array_key_exists($key,$array)){
+			return $array[$key];
+		}
+		
+		return $default;
+	}
+	
+	public static function dereference($x){
+		$y = array();
+		foreach($x as $key=>$value){
+			$y[$key] = $value;
+		}
+		return $y;
+	}
+}
+
+class HTMLElement {
+	public $defaultHTML = "";
+	public $tag = "";
+	public $ends = TRUE;
+	public $slash = FALSE;
+	public $params = array();
+	public $fileName = "";
+	public $childElements = array();
+	public $localData = array();
+	public $inside = "";
+	public function postConstruct()
+	{
+		if ($this->tag=="!DOCTYPE html"){
+			$this->ends = FALSE;
+		}
+	}
+	public function __construct()
+	{
+		$a = func_get_args(); 
+        $i = func_num_args(); 
+        if (method_exists($this,$f='__construct'.$i)) { 
+            call_user_func_array(array($this,$f),$a); 
+        }
+        $this->postConstruct();
+	}
+	public function __construct0()
+	{
+		//nothing
+	}
+	public function __construct1($value)
+	{
+		switch(gettype($value)){
+			case "array":
+				$this->defaultHTML 		= Helper::getArrayValue($value,"defaultHTML"	,$this->defaultHTML		);
+				$this->tag 				= Helper::getArrayValue($value,"tag"			,$this->tag				);
+				$this->ends 			= Helper::getArrayValue($value,"ends"			,$this->ends			);
+				$this->slash 			= Helper::getArrayValue($value,"slash"			,$this->slash			);
+				$this->params 			= Helper::getArrayValue($value,"params"			,$this->params			);
+				$this->fileName 		= Helper::getArrayValue($value,"fileName"		,$this->fileName		);
+				$this->childElements	= Helper::getArrayValue($value,"childElements"	,$this->childElements	);
+				$this->localData 		= Helper::getArrayValue($value,"localData"		,$this->localData		);
+				$this->inside	 		= Helper::getArrayValue($value,"inside"			,$this->inside			);
+				break;
+			default:
+				$this->tag = $value;
+		}
+	}
+	public function beginning()
+	{
+		if (strlen($this->fileName)>0){
+			return "";
+		}
+		if (strlen($this->defaultHTML)>0){
+			return $this->defaultHTML;
+		}
+		$beg = "";
+		$beg_slash = "";
+		if ($this->slash){
+			$beg_slash = "/";
+		}
+		if (strlen($this->tag)>0){
+			$beg = "<".$beg_slash.($this->tag);
+			foreach($this->params as $key=>$value){
+				$beg .= " ".$key;
+				if (gettype($value) != "boolean"){
+					$beg .= "=\"".$value."\"";
+				}
+				
+			}
+			$beg .= ">";
+		}
+		return $beg;
+	}
+	public function ending()
+	{
+		if (strlen($this->tag)<1 || !($this->ends) || $this->slash || strlen($this->defaultHTML)>0 || strlen($this->fileName)>0){
+			return "";
+		}
+		return "</".($this->tag).">";
+	}
+	public function fullHTML()
+	{
+		$text = $this->beginning();
+		$text .= $this->inside;
+		foreach($this->childElements as $value){
+			$text .= $value->fullHTML();
+		}
+		$text .= $this->ending();
+		return $text;
+	}
+	public function display()
+	{
+		if (strlen($this->fileName)>0){
+			$local_data = $this->localData;
+			include $fileName;
+			return;
+		}
+		print($this->fullHTML());
+	}
+	public function addChildElement($child)
+	{
+		if (gettype($child)=="array"){
+			foreach($child as $value){
+				$this->addChildElement($value);
+			}
+			return;
+		}
+		$this->childElements[] = $child;
+	}
+}
+
 
 
 class DB{
@@ -401,46 +531,46 @@ class DB{
 		}
 	}
 	
-	public static function insertValues($tableName,$valueArray){
+
 	
-		$types = "";
-		$keys = array_keys($valueArray);
-		$values = array_values($valueArray);
-		$refValues = array();
-		$numKeys = count($keys);
+	
+	public static function removeValues($tableName,$whereStatement,$whereValues){
+	
+		$refWhereValues = array();
 		
-		for ($i = 0; $i<$numKeys; $i+=1){
+		$numWhereValues = count($whereValues);
 		
-			$refValues[] = &$values[$i];
+		$whereTypes = "";
 		
-			if ($i==0){
-				$questionMarks = "?";
-			}else{
-				$questionMarks = $questionMarks.",?";
-			}
+		for ($i = 0; $i<$numWhereValues; $i+=1){
+		
+			$refWhereValues[] = &$whereValues[$i];
 			
-			switch(gettype($values[$i])){
+			switch(gettype($whereValues[$i])){
 				case "integer":
 				case "boolean":
-					$types = $types."i";
+					$whereTypes = $whereTypes."i";
 					break;
 				case "double":
-					$types = $types."d";
+					$whereTypes = $whereTypes."d";
 					break;
 				default:
-					$types = $types."s";
+					$whereTypes = $whereTypes."s";
 			}
 			
 		}
 		
-		$statementText = "INSERT INTO $tableName (".implode(",",$keys).") VALUES ($questionMarks)";
+		$statementText = "DELETE FROM $tableName WHERE $whereStatement";
+		
 		
 		if ($stmt = self::connection()->prepare($statementText)){
-			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$types),$refValues));
-			$stmt->execute();
-			$stmt->close();
 			
-			return mysqli_insert_id(self::connection());
+			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
+			
+			$stmt->execute();
+			
+			return TRUE;
+			
 		}else{
 			return FALSE;
 		}
@@ -532,7 +662,7 @@ class DB{
 				
 				//var_dump($out);
 				
-				$result[] = DB::dereference($out);
+				$result[] = Helper::dereference($out);
 			}
 			
 			$stmt->close();
@@ -545,60 +675,52 @@ class DB{
 		}
 	}
 	
-	public static function removeValues($tableName,$whereStatement,$whereValues){
+		public static function insertValues($tableName,$valueArray){
 	
-		$refWhereValues = array();
+		$types = "";
+		$keys = array_keys($valueArray);
+		$values = array_values($valueArray);
+		$refValues = array();
+		$numKeys = count($keys);
 		
-		$numWhereValues = count($whereValues);
+		for ($i = 0; $i<$numKeys; $i+=1){
 		
-		$whereTypes = "";
+			$refValues[] = &$values[$i];
 		
-		for ($i = 0; $i<$numWhereValues; $i+=1){
-		
-			$refWhereValues[] = &$whereValues[$i];
+			if ($i==0){
+				$questionMarks = "?";
+			}else{
+				$questionMarks = $questionMarks.",?";
+			}
 			
-			switch(gettype($whereValues[$i])){
+			switch(gettype($values[$i])){
 				case "integer":
 				case "boolean":
-					$whereTypes = $whereTypes."i";
+					$types = $types."i";
 					break;
 				case "double":
-					$whereTypes = $whereTypes."d";
+					$types = $types."d";
 					break;
 				default:
-					$whereTypes = $whereTypes."s";
+					$types = $types."s";
 			}
 			
 		}
 		
-		$statementText = "DELETE FROM $tableName WHERE $whereStatement";
-		
+		$statementText = "INSERT INTO $tableName (".implode(",",$keys).") VALUES ($questionMarks)";
 		
 		if ($stmt = self::connection()->prepare($statementText)){
-			
-			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
-			
+			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$types),$refValues));
 			$stmt->execute();
+			$stmt->close();
 			
-			return TRUE;
-			
+			return mysqli_insert_id(self::connection());
 		}else{
 			return FALSE;
 		}
 	}
 	
-	
-// General hepers
 
-	public static function dereference($x){
-		$y = array();
-		foreach($x as $key=>$value){
-			$y[$key] = $value;
-		}
-		return $y;
-	}
-	
-	
 }
 
 ?>
