@@ -2,6 +2,37 @@
 <?php
 
 class Helper {
+	public static function arrayUnion($array,$array1)
+	{
+		$booleanArray = Helper::getBooleanArray($array);
+		foreach($array1 as $value){
+			if (!Helper::arrayKeyIsTRUE($value,$booleanArray)){
+				$array[] = $value;
+			}
+		}
+		return $array;
+	}
+	public static function urlData($array)
+	{
+		$count = 0;
+		$text = "";
+		foreach($array as $key=>$value){
+			if ($count>0){
+				$text .= "&";
+			}
+			$text .= $key."=".urlencode($value);
+			$count += 1;
+		}
+		return $text;
+	}
+	public static function updatedArray($array,$array1)
+	{
+		foreach($array1 as $key=>$value){
+			$array[$key] = $value;
+		}
+		return $array;
+	}
+
 	public static function getArrayValue($array,$key,$default)
 	{
 		if (array_key_exists($key,$array)){
@@ -18,6 +49,31 @@ class Helper {
 		}
 		return $y;
 	}
+	
+	public static function pushHTMLHierarchy($array){
+		//TODO: MAKE THIS FUNCTION
+	}
+	
+	public static function loadLocalData(&$local_data,$get){
+		if($local_data==NULL){
+			$local_data = array();
+			foreach($get as $key=>$value){
+				$local_data[$key] = $value;
+			}
+		}
+	}
+	
+	public static function getBooleanArray($array){
+		$result = array();
+		foreach ($array as $value){
+			$result[$value] = TRUE;
+		}
+		return $result;
+	}
+	
+	public static function arrayKeyIsTRUE($key,$array){
+		return (array_key_exists($key,$array) && $array[$key]);
+	}
 }
 
 class HTMLElement {
@@ -30,6 +86,7 @@ class HTMLElement {
 	public $childElements = array();
 	public $localData = array();
 	public $inside = "";
+	public $insideFunction = FALSE;
 	public function postConstruct()
 	{
 		if ($this->tag=="!DOCTYPE html"){
@@ -62,6 +119,7 @@ class HTMLElement {
 				$this->childElements	= Helper::getArrayValue($value,"childElements"	,$this->childElements	);
 				$this->localData 		= Helper::getArrayValue($value,"localData"		,$this->localData		);
 				$this->inside	 		= Helper::getArrayValue($value,"inside"			,$this->inside			);
+				$this->insideFunction	= Helper::getArrayValue($value,"insideFunction"	,$this->insideFunction	);
 				break;
 			default:
 				$this->tag = $value;
@@ -100,7 +158,7 @@ class HTMLElement {
 		}
 		return "</".($this->tag).">";
 	}
-	public function fullHTML()
+	/*public function fullHTML()
 	{
 		$text = $this->beginning();
 		$text .= $this->inside;
@@ -109,15 +167,24 @@ class HTMLElement {
 		}
 		$text .= $this->ending();
 		return $text;
-	}
+	}*/
 	public function display()
 	{
+		print($this->beginning());
+		print($this->inside);
+		if ($this->insideFunction){
+			$insideF = $this->insideFunction;
+			$insideF();
+		}
 		if (strlen($this->fileName)>0){
 			$local_data = $this->localData;
 			include $fileName;
 			return;
 		}
-		print($this->fullHTML());
+		foreach($this->childElements as $value){
+			$value->display();
+		}
+		print($this->ending());
 	}
 	public function addChildElement($child)
 	{
@@ -137,6 +204,19 @@ class DB{
 
 
 //High level functions
+
+	public static function categoryIdsFromString($string)
+	{
+		$array = explode(",",$string);
+		$result = array();
+		foreach($array as $value){
+			$id = $value+0;
+			if ($cat = DB::getCategoryById($id)){
+				$result[] = $id;
+			}
+		}
+		return $result;
+	}
 
 	public static function insertProduct($name, $description, $price)
 	{
