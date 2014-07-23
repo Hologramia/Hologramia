@@ -76,21 +76,29 @@
 	
 	//Search bar
 	$searchBar = new HTMLElement();
+	$searchForm = new HTMLElement(array(
+		"tag"=>"form",
+		"params"=>array("action"=>"","method"=>"get")
+	));
+	$searchBar->addChildElement($searchForm);
 	$searchTextBox = new HTMLElement(array(
 		"tag"=>"input",
-		"params"=>array("type"=>"text")
+		"params"=>array("type"=>"text","name"=>"q","value"=>htmlentities($q))
 	));
 	$searchButton = new HTMLElement(array(
 		"tag"=>"input",
-		"params"=>array("type"=>"submit")
+		"params"=>array("type"=>"submit","value"=>"Buscar")
 	));
-	$searchBar->addChildElement(array($searchTextBox,$searchButton));
+	$searchHiddenField = new HTMLElement(array(
+		"tag"=>"input",
+		"params"=>array("type"=>"hidden","name"=>"cats","value"=>implode(",",$categoryIdArray))
+	));
+	$searchForm->addChildElement(array($searchTextBox,$searchButton,$searchHiddenField));
 	
 	//Search filters
 	$searchFilters = new HTMLElement(array(
 		"tag"=>"div",
-		"params"=>array("id"=>"filters"),
-		"inside"=>"filters"
+		"params"=>array("id"=>"filters")
 	));
 	
 	$catypes = DB::getAllCatypes();
@@ -159,9 +167,16 @@
 	//Product list
 	$productList = new HTMLElement(array(
 		"tag"=>"div",
-		"params"=>array("id"=>"product-list"),
-		"inside"=>"products"
+		"params"=>array("id"=>"product-list")
 	));
+	
+	foreach ($products as $product){
+		$productElement = new HTMLElement(array(
+			"tag" => "div",
+			"inside" => $product["name"]
+		));
+		$productList->addChildElement($productElement);
+	}
 	
 	
 	$body->addChildElement(array($topBanner,$searchBar,$searchFilters,$productList));
