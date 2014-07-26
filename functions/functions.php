@@ -74,6 +74,13 @@ class Helper {
 	public static function arrayKeyIsTRUE($key,$array){
 		return (array_key_exists($key,$array) && $array[$key]);
 	}
+	
+	public static function arrayMinusKeys($array,$keys){
+		foreach ($keys as $key){
+			unset($array[$key]);
+		}
+		return $array;
+	}
 }
 
 class HTMLElement {
@@ -195,6 +202,19 @@ class HTMLElement {
 			return;
 		}
 		$this->childElements[] = $child;
+	}
+	public static function hiddenInputs($array)
+	{
+		$inputArray = array();
+		foreach($array as $key=>$value){
+			$inputArray[] = new HTMLElement(array(
+				"tag"=>"input",
+				"params"=>array("type"=>"hidden",
+								"name"=>$key,
+								"value"=>htmlentities($value))
+			));
+		}
+		return $inputArray;
 	}
 }
 
