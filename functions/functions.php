@@ -1,6 +1,18 @@
 
 <?php
 
+class Holo {
+	public static function updateActionDictionary(&$actionDict,$actionArray)
+	{
+		if (!($key = array_search($actionArray,$actionDict))){
+			$key = uniqid("holo",TRUE);
+			$actionDict[$key] = $actionArray;
+		}
+		
+		return $key;
+	}
+}
+
 class Helper {
 	public static function arrayUnion($array,$array1)
 	{
@@ -50,11 +62,7 @@ class Helper {
 		return $y;
 	}
 	
-	public static function pushHTMLHierarchy($array){
-		//TODO: MAKE THIS FUNCTION
-	}
-	
-	public static function loadLocalData(&$local_data,$get){
+	public static function loadArrayIfNULL(&$local_data,$get){
 		if($local_data==NULL){
 			$local_data = array();
 			foreach($get as $key=>$value){

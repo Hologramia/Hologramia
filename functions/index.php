@@ -1,12 +1,48 @@
 <?php
 
+	
 	session_start();
+	
+	/*session_unset();
+
+	exit;*/
 
 	require_once('functions.php');
 	
+	Helper::loadArrayIfNULL($local_data,$_GET);
 	
+	var_dump($_SESSION);
 	
-	Helper::loadLocalData($local_data,$_GET);
+	//Dictionary of hash=>array("key"=>key,"param"=>string_param)
+	$action_dict = Helper::getArrayValue($_SESSION,"actions",array());
+	
+	$action_functions = array(
+		"add-product-to-cart" => (function($product_id){
+			echo "ADDING PRODUCT TO CART ...";
+			$cart_products = Helper::getArrayValue($_SESSION,"cart",array());
+			$index = -1;
+			foreach($cart_products as $i=>$value){
+				if ($value["product_id"]===$product_id){
+					$index = $i;
+				}
+			}
+			if ($index==-1){
+				$cart_products[] = array("product_id"=>$product_id,"count"=>1);
+			}
+			$_SESSION["cart"] = $cart_products;
+		})
+	);
+	
+	if ($currentActionKey = Helper::getArrayValue($local_data,"action",FALSE)){
+		$actionArray = $action_dict[$currentActionKey];
+		if ($function = Helper::getArrayValue($action_functions,$actionArray["key"],FALSE)){
+			$function($actionArray["param"]);
+		}
+		unset($action_dict[$currentActionKey]);
+	}
+	
+	//Helper::updateActionDictionary($action_dict,);
+	
 	
 	$categoryIdArray = array_key_exists("cats",$local_data)?DB::categoryIdsFromString($local_data["cats"]):array();
 	$categoryIdBooleanArray = Helper::getBooleanArray($categoryIdArray);
@@ -28,7 +64,14 @@
 	foreach($categoryIdBooleanArray as $key=>$value){
 		$existingCategoriesBooleanArray[$key] = TRUE;
 	}
+	/*
+	$a = array("a"=>"b","c"=>"d");
+	$b = array("a"=>"b","c"=>"d");
 	
+	if ($a===$b){
+		echo ("(a=b)");
+	}
+	*/
 	//Stylesheet
 	$styleTag = new HTMLElement(array(
 		"insideFunction" => (function(){
@@ -358,7 +401,7 @@
 			"tag" => "div",
 			"inside" => $product["name"]
 		));
-		$uniqueAddId = uniqid();
+		$uniqueAddId = Holo::updateActionDictionary($action_dict,array("key"=>"add-product-to-cart","param"=>$product["id"]));
 		$productAddLink = new HTMLElement(array(
 			"tag" => "a",
 			"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueAddId)))),
@@ -377,6 +420,10 @@
 	));
 	
 	$body->addChildElement(array($topBanner,$searchFilters,$rightColumn,$productList));
+	
+	
+	$_SESSION["actions"] = $action_dict;
+	
 	
 	$document->display();
 
