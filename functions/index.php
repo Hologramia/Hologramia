@@ -1,7 +1,10 @@
 <?php
-
+	ob_start();
+	
 	
 	session_start();
+	
+	
 	
 	/*session_unset();
 
@@ -11,14 +14,21 @@
 	
 	Helper::loadArrayIfNULL($local_data,$_GET);
 	
-	var_dump($_SESSION);
+	if (Helper::getArrayValue($local_data,"reset",FALSE)){
+		session_unset();
+		header("Location: ?");
+		exit;
+	}
+	
+	//var_dump($_SESSION);
 	
 	//Dictionary of hash=>array("key"=>key,"param"=>string_param)
 	$action_dict = Helper::getArrayValue($_SESSION,"actions",array());
 	
 	$action_functions = array(
 		"add-product-to-cart" => (function($product_id){
-			echo "ADDING PRODUCT TO CART ...";
+			//echo "f1";
+			//exit;
 			$cart_products = Helper::getArrayValue($_SESSION,"cart",array());
 			$index = -1;
 			foreach($cart_products as $i=>$value){
@@ -30,15 +40,37 @@
 				$cart_products[] = array("product_id"=>$product_id,"count"=>1);
 			}
 			$_SESSION["cart"] = $cart_products;
+		}),
+		"remove-product-from-cart" => (function($product_id){
+			//echo "f2";
+			//exit;
+			$cart_products = Helper::getArrayValue($_SESSION,"cart",array());
+			$index = -1;
+			foreach($cart_products as $i=>$value){
+				if ($value["product_id"]===$product_id){
+					$index = $i;
+				}
+			}
+			if ($index!=-1){
+				array_splice($cart_products, $index, 1);
+			}
+			$_SESSION["cart"] = $cart_products;
 		})
 	);
 	
-	if ($currentActionKey = Helper::getArrayValue($local_data,"action",FALSE)){
-		$actionArray = $action_dict[$currentActionKey];
-		if ($function = Helper::getArrayValue($action_functions,$actionArray["key"],FALSE)){
-			$function($actionArray["param"]);
+	if ($currentActionKeyArray = Helper::getArrayValue($local_data,"action",FALSE)){
+		$currentActionKeyArray = explode(",",$currentActionKeyArray);
+		foreach ($currentActionKeyArray as $currentActionKey){
+			if ($actionArray = Helper::getArrayValue($action_dict,$currentActionKey,FALSE)){
+				if ($function = Helper::getArrayValue($action_functions,$actionArray["key"],FALSE)){
+					//echo "running:".$actionArray["key"];
+					$function($actionArray["param"]);
+				}
+				unset($action_dict[$currentActionKey]);
+			}
 		}
-		unset($action_dict[$currentActionKey]);
+		header("Location: ?".Helper::urlData(Helper::arrayMinusKeys($local_data,array("action"))));
+		exit;
 	}
 	
 	//Helper::updateActionDictionary($action_dict,);
@@ -146,7 +178,16 @@
 				margin-left:5px;
 			}
 			
-			#filters > h2{
+			#right-column>div{
+				border-style:solid;
+				border-width:3px;
+				border-color:rgb(230,230,230);
+				padding:3px;
+				margin-top:3px;
+				border-radius:6px;
+			}
+			
+			h2{
 				padding:0px;
 				margin:0px;
 			}
@@ -412,12 +453,39 @@
 	}
 	
 	
-	//Right column
+	//Cart
 	$rightColumn = new HTMLElement(array(
 		"tag"=>"div",
 		"params"=>array("id"=>"right-column"),
+	));
+	
+	$cartTitle = new HTMLElement(array(
+		"tag"=>"h1",
 		"inside"=>"Carrito"
 	));
+	
+	$rightColumn->addChildElement($cartTitle);
+	
+	if ($cartItems = Helper::getArrayValue($_SESSION,"cart",FALSE)){
+		foreach($cartItems as $item){
+			if ($product = DB::getProductById($item["product_id"])){
+				$productElement = new HTMLElement(array(
+					"tag"=>"div",
+					"inside"=>$product["name"]." (".$item["count"].")"
+				));
+				
+				$uniqueRemoveId = Holo::updateActionDictionary($action_dict,array("key"=>"remove-product-from-cart","param"=>$product["id"]));
+				$productRemoveLink = new HTMLElement(array(
+					"tag" => "a",
+					"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueRemoveId)))),
+					"inside"=>"[remover]"
+				));
+				
+				$productElement->addChildElement($productRemoveLink);
+				$rightColumn->addChildElement($productElement);
+			}
+		}
+	}
 	
 	$body->addChildElement(array($topBanner,$searchFilters,$rightColumn,$productList));
 	
