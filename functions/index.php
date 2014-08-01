@@ -55,7 +55,48 @@
 				array_splice($cart_products, $index, 1);
 			}
 			$_SESSION["cart"] = $cart_products;
+		}),
+		"decrement-product-in-cart" => (function($product_id){
+			//echo "f2";
+			//exit;
+			$cart_products = Helper::getArrayValue($_SESSION,"cart",array());
+			$product = FALSE;
+			$index = -1;
+			foreach($cart_products as $i=>$value){
+				if ($value["product_id"]===$product_id){
+					$product = $value;
+					$index = $i;
+				}
+			}
+			if ($index != -1 && $product){
+				if ($product["count"]<=1){
+					array_splice($cart_products, $index, 1);
+				}else{
+					$product["count"] -= 1;
+					$cart_products[$index] = $product;
+				}
+			}
+			$_SESSION["cart"] = $cart_products;
+		}),
+		"increment-product-in-cart" => (function($product_id){
+			//echo "f2";
+			//exit;
+			$cart_products = Helper::getArrayValue($_SESSION,"cart",array());
+			$product = FALSE;
+			$index = -1;
+			foreach($cart_products as $i=>$value){
+				if ($value["product_id"]===$product_id){
+					$product = $value;
+					$index = $i;
+				}
+			}
+			if ($index != -1 && $product){
+				$product["count"] += 1;
+				$cart_products[$index] = $product;
+			}
+			$_SESSION["cart"] = $cart_products;
 		})
+		
 	);
 	
 	if ($currentActionKeyArray = Helper::getArrayValue($local_data,"action",FALSE)){
@@ -69,6 +110,7 @@
 				unset($action_dict[$currentActionKey]);
 			}
 		}
+		$_SESSION["actions"] = $action_dict;
 		header("Location: ?".Helper::urlData(Helper::arrayMinusKeys($local_data,array("action"))));
 		exit;
 	}
@@ -209,6 +251,15 @@
 				height:140px;
 				margin:5px;
 				vertical-align:middle;
+				overflow:hidden;
+			}
+			
+			.product-thumb{
+				display:block;
+				height:50px;
+				background-size: auto 100%;
+				background-repeat: no-repeat;
+				background-position:center;
 			}
 
 			.catype-title{
@@ -264,7 +315,7 @@
 			}
 			
 			.category-title[data-selected]{
-				color:rgb(100,120,100);;
+				color:rgb(100,120,100);
 			}
 			
 			.category-title[data-selected] + a{
@@ -439,16 +490,32 @@
 	
 	foreach ($products as $product){
 		$productElement = new HTMLElement(array(
-			"tag" => "div",
-			"inside" => $product["name"]
+			"tag" => "div"
 		));
-		$uniqueAddId = Holo::updateActionDictionary($action_dict,array("key"=>"add-product-to-cart","param"=>$product["id"]));
-		$productAddLink = new HTMLElement(array(
-			"tag" => "a",
-			"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueAddId)))),
-			"inside"=>"[agregar]"
+		$productThumbnail = new HTMLElement(array(
+			"tag"=>"div",
+			"params"=>array("class"=>"product-thumb","style"=>"background-image:url(".$product["thumb"].")")
 		));
-		$productElement->addChildElement($productAddLink);
+		$productName = new HTMLElement(array(
+			"tag"=>"div",
+			"inside"=>$product["name"],
+			"param"=>array("class"=>"product-name");
+		));
+		$productDescription = new HTMLElement(array(
+			"tag"=>"div",
+			"inside"=>$product["description"],
+			"param"=>array("class"=>"product-description");
+		));
+		$productElement->addChildElement(array($productThumbnail,$productName,$productDescription));
+		if (!Helper::array_path_exists(array("cart",NULL,"product_id",$product["id"]),$_SESSION)){
+			$uniqueAddId = Holo::updateActionDictionary($action_dict,array("key"=>"add-product-to-cart","param"=>$product["id"]));
+			$productAddLink = new HTMLElement(array(
+				"tag" => "a",
+				"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueAddId)))),
+				"inside"=>"[agregar]"
+			));
+			$productElement->addChildElement($productAddLink);
+		}
 		$productList->addChildElement($productElement);
 	}
 	
@@ -471,17 +538,43 @@
 			if ($product = DB::getProductById($item["product_id"])){
 				$productElement = new HTMLElement(array(
 					"tag"=>"div",
-					"inside"=>$product["name"]." (".$item["count"].")"
+					"inside"=>$product["name"]
 				));
 				
+				//DECREMENT
+				if ($item["count"]>1){
+					$uniqueDecrementId = Holo::updateActionDictionary($action_dict,array("key"=>"decrement-product-in-cart","param"=>$product["id"]));
+					$productDecrementLink = new HTMLElement(array(
+						"tag" => "a",
+						"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueDecrementId)))),
+						"inside"=>"[-]"
+					));
+					$productElement->addChildElement($productDecrementLink);
+				}
+				//COUNT
+				$countElement = new HTMLElement(array(
+					"tag"=>"span",
+					"inside"=>$item["count"]
+				));
+				$productElement->addChildElement($countElement);
+				//INCREMENT
+				$uniqueIncrementId = Holo::updateActionDictionary($action_dict,array("key"=>"increment-product-in-cart","param"=>$product["id"]));
+				$productIncrementLink = new HTMLElement(array(
+					"tag" => "a",
+					"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueIncrementId)))),
+					"inside"=>"[+]"
+				));
+				$productElement->addChildElement($productIncrementLink);
+				//REMOVE
 				$uniqueRemoveId = Holo::updateActionDictionary($action_dict,array("key"=>"remove-product-from-cart","param"=>$product["id"]));
 				$productRemoveLink = new HTMLElement(array(
 					"tag" => "a",
 					"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueRemoveId)))),
 					"inside"=>"[remover]"
 				));
-				
 				$productElement->addChildElement($productRemoveLink);
+				
+				//Add product
 				$rightColumn->addChildElement($productElement);
 			}
 		}

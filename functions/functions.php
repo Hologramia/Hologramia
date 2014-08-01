@@ -89,6 +89,36 @@ class Helper {
 		}
 		return $array;
 	}
+	
+	public static function array_path_exists($path,$array){
+		if (count($path)==0){
+			return TRUE;
+		}
+		$key = $path[0];
+		if (count($path)==1 && $key===$array){
+			return TRUE;
+		}
+		if (gettype($array) != "array"){
+			return FALSE;
+		}
+		if (count($array)==0){
+			return FALSE;
+		}
+		if ($key===NULL){
+			array_splice($path,0,1);
+			foreach($array as $value){
+				if (Helper::array_path_exists($path,$value)){
+					return TRUE;
+				}
+			}
+			return FALSE;
+		}elseif(gettype($key) != "string" && gettype($key) != "integer"){
+			return FALSE;
+		}else{
+			array_splice($path,0,1);
+			return (array_key_exists($key,$array) && Helper::array_path_exists($path,$array[$key]));
+		}
+	}
 }
 
 class HTMLElement {
@@ -246,9 +276,9 @@ class DB{
 		return $result;
 	}
 
-	public static function insertProduct($name, $description, $price)
+	public static function insertProduct($name, $description, $price, $thumb)
 	{
-		$insert_id = DB::insertValues("product",array("name"=>$name,"description"=>$description,"price"=>$price));
+		$insert_id = DB::insertValues("product",array("name"=>$name,"description"=>$description,"price"=>$price,"thumb"=>$thumb));
 		DB::updateTextForProduct($insert_id);
 		return $insert_id;
 	}
