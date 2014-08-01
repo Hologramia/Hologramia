@@ -247,8 +247,8 @@
 				background-color:rgb(240,240,240);
 				padding:5px;
 				border-radius:6px;
-				width:100px;
-				height:140px;
+				width:150px;
+				height:220px;
 				margin:5px;
 				vertical-align:middle;
 				overflow:hidden;
