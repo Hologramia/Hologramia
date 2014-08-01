@@ -499,12 +499,12 @@
 		$productName = new HTMLElement(array(
 			"tag"=>"div",
 			"inside"=>$product["name"],
-			"param"=>array("class"=>"product-name");
+			"param"=>array("class"=>"product-name")
 		));
 		$productDescription = new HTMLElement(array(
 			"tag"=>"div",
 			"inside"=>$product["description"],
-			"param"=>array("class"=>"product-description");
+			"param"=>array("class"=>"product-description")
 		));
 		$productElement->addChildElement(array($productThumbnail,$productName,$productDescription));
 		if (!Helper::array_path_exists(array("cart",NULL,"product_id",$product["id"]),$_SESSION)){
