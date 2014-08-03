@@ -1,6 +1,8 @@
 
 <?php
 
+require_once("con.php");
+
 class Holo {
 	public static function updateActionDictionary(&$actionDict,$actionArray)
 	{
@@ -257,7 +259,6 @@ class HTMLElement {
 }
 
 
-
 class DB{
 
 
@@ -456,7 +457,7 @@ class DB{
 		$id_array = array();
         $array_con_todo = array();
 		
-		if ($stmt = self::connection()->prepare("SELECT id, name, allows_multiple FROM catype")) {
+		if ($stmt = CON::connection()->prepare("SELECT id, name, allows_multiple FROM catype")) {
 			//$stmt->bind_param(,);
 			$stmt->execute();
 			$stmt->bind_result($id, $name, $allows_multiple);
@@ -494,7 +495,7 @@ class DB{
 		$id_array = array();
         $array_con_todo = array();
 		
-	  if ($stmt = self::connection()->prepare("SELECT id, name, catype_id FROM category WHERE catype_id = ?")) {
+	  if ($stmt = CON::connection()->prepare("SELECT id, name, catype_id FROM category WHERE catype_id = ?")) {
 			$stmt->bind_param("i",$catype_id);
 			$stmt->execute();
 			$stmt->bind_result($category_id, $name, $catype_id);
@@ -528,7 +529,7 @@ class DB{
 		$id_array = array();
         $array_con_todo = array();
 		
-		if ($stmt = self::connection()->prepare("SELECT id,name,description,price FROM product")) {
+		if ($stmt = CON::connection()->prepare("SELECT id,name,description,price FROM product")) {
 			//$stmt->bind_param(,);
 			$stmt->execute();
 			$stmt->bind_result($id,$name,$description,$price);
@@ -576,27 +577,7 @@ class DB{
 // Low level functions
 
 
-	public static $connection = NULL;
 	
-	public static function connection()
-	{
-		if (self::$connection != NULL) {
-			return self::$connection;
-		}
-
-		$con = new mysqli("localhost", "root", "", "hologramia_schema");
-		if ($con->connect_errno) {
-			$con = new mysqli("localhost", "root", "123", "hologramia_schema");
-			if ($con->connect_errno) {
-				echo "Failed to connect to MySQL: (" . $con->connect_errno . ") " . $con->connect_error;
-				self::$connection = NULL;
-				return self::$connection;
-			}
-		}
-
-		self::$connection = $con;
-		return $con;
-	}
 	
 	public static function updateValues($tableName,$valueArray,$whereStatement,$whereValues){
 	
@@ -658,7 +639,7 @@ class DB{
 		
 		$statementText = "UPDATE $tableName $questionMarks WHERE $whereStatement";
 		
-		if ($stmt = self::connection()->prepare($statementText)){
+		if ($stmt = CON::connection()->prepare($statementText)){
 			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$allTypes),$refValues,$refWhereValues));
 			$stmt->execute();
 			$stmt->close();
@@ -701,7 +682,7 @@ class DB{
 		$statementText = "DELETE FROM $tableName WHERE $whereStatement";
 		
 		
-		if ($stmt = self::connection()->prepare($statementText)){
+		if ($stmt = CON::connection()->prepare($statementText)){
 			
 			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$whereTypes),$refWhereValues));
 			
@@ -763,7 +744,7 @@ class DB{
 		print("<br/>");*/
 		
 		
-		if ($stmt = self::connection()->prepare($statementText)){
+		if ($stmt = CON::connection()->prepare($statementText)){
 			
 			/*print("statement:</br>");
 			var_dump($statementText);
@@ -808,7 +789,7 @@ class DB{
 			return $result;
 			
 		}else{
-			die($statementText."<br/>".self::connection()->error);
+			die($statementText."<br/>".CON::connection()->error);
 			return FALSE;
 		}
 	}
@@ -847,12 +828,12 @@ class DB{
 		
 		$statementText = "INSERT INTO $tableName (".implode(",",$keys).") VALUES ($questionMarks)";
 		
-		if ($stmt = self::connection()->prepare($statementText)){
+		if ($stmt = CON::connection()->prepare($statementText)){
 			call_user_func_array("mysqli_stmt_bind_param",array_merge(array(&$stmt,&$types),$refValues));
 			$stmt->execute();
 			$stmt->close();
 			
-			return mysqli_insert_id(self::connection());
+			return mysqli_insert_id(CON::connection());
 		}else{
 			return FALSE;
 		}

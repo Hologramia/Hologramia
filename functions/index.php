@@ -150,6 +150,15 @@
 	$styleTag = new HTMLElement(array(
 		"insideFunction" => (function(){
 
+$search_bar_height = 30;
+$search_bar_width = 200;
+$search_button_width = 60;
+$search_bar_button_padding = 0;
+
+$light_gray_color = "#cccccc";
+
+$medium_gray_color = "#aaaaaa";
+
 ?>
 <style type="text/css">
 
@@ -177,25 +186,37 @@
 				/*background-color:blue;*/
 				position:relative;
 				display:inline-block;
-				vertical-align:top;
-				padding-top:5px;
+				height:<?php print($search_bar_height); ?>px;
+				width:<?php print($search_bar_width+$search_button_width+$search_bar_button_padding); ?>px;
 			}
 			
 			#search-box-container>input[type=text]{
-				height:25px;
+				position:absolute;
+				top:0px;
+				left:0px;
+				height:<?php print($search_bar_height); ?>px;
 				padding:0px; margin:0px;
-				border-style:solid;border-color:black;border-width:1px;
-				margin-right:10px;
-				width:200px;
+				border-style:solid;border-color:<?php print($light_gray_color); ?>;border-width:1px;
+				width:<?php print($search_bar_width); ?>px;
 				font-size:15px;
+				display:inline-block;
+				z-index:100;
 			}
 			#search-box-container>input[type=submit]{
-				height:25px;
+				position:absolute;
+				top:0px;
+				right:0px;
+				height:<?php print($search_bar_height+2); ?>px;
 				padding:0px;
-				width:50px;
+				width:<?php print($search_button_width); ?>px;
 				margin:0px;
-				border-style:solid;border-color:black;border-width:1px;
-				background-color:rgb(230,230,230);
+				border-style:solid;border-color:<?php print($medium_gray_color); ?>;border-width:1px;
+				background-color:<?php print($medium_gray_color); ?>;
+				background-image:url(search-white.png);
+				background-position:center;
+				background-repeat:no-repeat;
+				display:inline-block;
+				cursor:pointer;
 			}
 			
 			#filters, #right-column
@@ -236,7 +257,6 @@
 			
 			#product-list{
 				height:500px;
-				padding-top:5px;
 			}
 			
 			#product-list>div{
@@ -250,8 +270,14 @@
 				width:150px;
 				height:220px;
 				margin:5px;
+				margin-top:0px;
+				margin-bottom:10px;
 				vertical-align:middle;
 				overflow:hidden;
+			}
+			
+			#product-list>div>h3{
+				text-align:center;
 			}
 			
 			.product-thumb{
@@ -360,7 +386,7 @@
 	));
 	$searchButton = new HTMLElement(array(
 		"tag"=>"input",
-		"params"=>array("type"=>"submit","value"=>"Buscar")
+		"params"=>array("type"=>"submit","value"=>"")
 	));
 	$searchTextBoxContainer->addChildElement(array($searchTextBox,$searchButton));
 	$hiddenFieldArray = HTMLElement::hiddenInputs(Helper::arrayMinusKeys($local_data,array("q")));
@@ -497,9 +523,8 @@
 			"params"=>array("class"=>"product-thumb","style"=>"background-image:url(".$product["thumb"].")")
 		));
 		$productName = new HTMLElement(array(
-			"tag"=>"div",
-			"inside"=>$product["name"],
-			"param"=>array("class"=>"product-name")
+			"tag"=>"h3",
+			"inside"=>$product["name"]
 		));
 		$productDescription = new HTMLElement(array(
 			"tag"=>"div",
@@ -527,7 +552,7 @@
 	));
 	
 	$cartTitle = new HTMLElement(array(
-		"tag"=>"h1",
+		"tag"=>"h2",
 		"inside"=>"Carrito"
 	));
 	
@@ -540,7 +565,6 @@
 					"tag"=>"div",
 					"inside"=>$product["name"]
 				));
-				
 				//DECREMENT
 				if ($item["count"]>1){
 					$uniqueDecrementId = Holo::updateActionDictionary($action_dict,array("key"=>"decrement-product-in-cart","param"=>$product["id"]));
