@@ -150,20 +150,43 @@
 	$styleTag = new HTMLElement(array(
 		"insideFunction" => (function(){
 
-$search_bar_height = 30;
-$search_bar_width = 200;
+$search_bar_height = 35;
+$search_bar_width = 300;
 $search_button_width = 60;
 $search_bar_button_padding = 0;
+
+$search_corner_radius = 4;
+
+$almost_white_color = "#fdfdfd";
+$very_light_gray_color = "#f3f3f3";
 
 $light_gray_color = "#cccccc";
 
 $medium_gray_color = "#aaaaaa";
 
+$selected_checkbox_color = "#44cc66";
+
+$product_padding = 30;
+$top_product_padding = 30;
+
+$top_bar_height = 60;
+$filters_width = 170;
+$cart_width = 250;
+
+
+
 ?>
 <style type="text/css">
 
 			body{
-				font-family:'Trebuchet MS';
+				font-family:'HelveticaNeue-Light';
+				margin:0px;
+				padding:0px;
+				border:0px;
+				background-color:<?php print($very_light_gray_color); ?>;
+			}
+			
+			#content-body{
 			}
 
 			h1{
@@ -172,11 +195,33 @@ $medium_gray_color = "#aaaaaa";
 				padding:0px;
 				margin:0px;
 				margin-right:10px;
+				font-weight:normal;
+			}
+			
+			h2{
+				padding:0px;
+				margin:0px;
+				font-weight:normal;
+				text-align:center;
+			}
+			
+			h3{
+				font-weight:normal;
+				text-align:center;
+				margin:0px;
+				padding:0px;
+			}
+			
+			h4{
+				font-weight:normal;
+				text-align:center;
+				margin-top:5px;
+				margin-bottom:5px;
 			}
 			
 			#top-banner{
-				/*background-color:red;*/
-				margin-bottom:10px;
+				padding:10px;
+				height:<?php print($top_bar_height); ?>px;
 			}
 			
 			form{display:inline;margin:0px;padding:0px;border:0px;}
@@ -201,6 +246,8 @@ $medium_gray_color = "#aaaaaa";
 				font-size:15px;
 				display:inline-block;
 				z-index:100;
+				border-top-left-radius:<?php print($search_corner_radius); ?>px;
+				border-bottom-left-radius:<?php print($search_corner_radius); ?>px;
 			}
 			#search-box-container>input[type=submit]{
 				position:absolute;
@@ -210,138 +257,191 @@ $medium_gray_color = "#aaaaaa";
 				padding:0px;
 				width:<?php print($search_button_width); ?>px;
 				margin:0px;
-				border-style:solid;border-color:<?php print($medium_gray_color); ?>;border-width:1px;
-				background-color:<?php print($medium_gray_color); ?>;
-				background-image:url(search-white.png);
+				border-style:solid;border-color:<?php print($light_gray_color); ?>;border-width:1px;
+				background-color:<?php print($light_gray_color); ?>;
+				background-image:url(magnifying.png);
 				background-position:center;
 				background-repeat:no-repeat;
+				background-size: auto 70%;
 				display:inline-block;
 				cursor:pointer;
+				border-top-right-radius:<?php print($search_corner_radius); ?>px;
+				border-bottom-right-radius:<?php print($search_corner_radius); ?>px;
 			}
 			
 			#filters, #right-column
 			{
 				border-style:solid;
-				border-width:2px;
-				border-color:rgb(230,230,230);
-				padding:10px;
-				background-color:white;
-				border-radius:6px;
+				border-width:0px;
+				border-radius:0px;
+			}
+			
+			#filters h3, #right-column h3{
+				color:#555;
+				padding:3px;
 			}
 			
 			#filters{
-				float:left;
-				width:150px;
-				margin-right:5px;
+				position:absolute;
+				left:0px;
+				top:<?php print($top_bar_height); ?>px;
+				width:<?php print($filters_width); ?>px;
+				margin-right:<?php print($product_padding/2); ?>px;
 			}
 			
+			
 			#right-column{
-				width:150px;
-				float:right;
-				margin-left:5px;
+				position:absolute;
+				right:0px;
+				top:<?php print($top_bar_height); ?>px;
+				width:<?php print($cart_width); ?>px;
+				margin-left:<?php print($product_padding/2); ?>px;
 			}
 			
 			#right-column>div{
 				border-style:solid;
-				border-width:3px;
+				border-width:0px;
 				border-color:rgb(230,230,230);
-				padding:3px;
-				margin-top:3px;
 				border-radius:6px;
+				position:relative;
+				margin-top:10px;
+				background-color:<?php print($medium_gray_color); ?>;
+				background-color:white;
+				padding:10px;
 			}
 			
-			h2{
-				padding:0px;
-				margin:0px;
+			#filters h2{display:none;}
+			
+			.category-set{
+				padding-top:7px;
+				padding-bottom:7px;
+				background-color:<?php print($almost_white_color); ?>;
+				/*box-shadow: inset 0px 2px 2px #eaeaea;
+				-webkit-box-shadow: inset 0px 2px 2px #eaeaea;
+				-moz-box-shadow: inset 0px 2px 2px #eaeaea;*/
+				border-radius:5px;
 			}
 			
 			#product-list{
-				height:500px;
+				position:absolute;
+				left:<?php print($filters_width); ?>px;
+				right:<?php print($cart_width); ?>px;
+				top:<?php print($top_bar_height); ?>px;
+				min-height:500px;
+				text-align:center;
+				padding-bottom:20px;
 			}
 			
 			#product-list>div{
+				position:relative;
 				display:inline-block;
 				border-style:solid;
 				border-width:0px;
 				border-color:light-gray;
-				background-color:rgb(240,240,240);
+				background-color:white;
 				padding:5px;
-				border-radius:6px;
-				width:150px;
-				height:220px;
-				margin:5px;
-				margin-top:0px;
-				margin-bottom:10px;
+				border-radius:5px;
+				width:165px;
+				height:270px;
+				margin:<?php print($product_padding/2); ?>px;
+				margin-top:<?php print($top_product_padding); ?>px;
+				margin-bottom:<?php print($top_product_padding-$product_padding); ?>px;
 				vertical-align:middle;
+				overflow:hidden;
+				box-shadow: 0px 2px 2px #ddd;
+				-webkit-box-shadow: 0px 2px 2px #ddd;
+				-moz-box-shadow: 0px 2px 2px #ddd;
+			}
+			
+			.product-name{
+				text-align:center;
+				padding-top:20px;
+				padding-bottom:20px;
 				overflow:hidden;
 			}
 			
-			#product-list>div>h3{
-				text-align:center;
+			.product-price{
+				text-align:left;
+				position:absolute;
+				left:0px;
+				bottom:0px;
+				background:white;
+				width:100%;
+				box-shadow: 0px -10px 10px #fff;
+				-webkitbox-shadow: 0px -10px 10px #fff;
+				-moz-box-shadow: 0px -10px 10px #fff;
+			}
+			
+			.cart-link,.cart-link-no{
+				z-index:100;
+				position:absolute;
+				right:5px;
+				bottom:0px;
+				height:30px;
+				width:30px;
+				background-image:url(cart.png);
+				background-position:center;
+				background-repeat:no-repeat;
+				background-size:auto 100%;
+			}
+			
+			.cart-link-no{
+				pointer-events:none;
+				opacity:0.3;
 			}
 			
 			.product-thumb{
 				display:block;
-				height:50px;
+				height:130px;
 				background-size: auto 100%;
 				background-repeat: no-repeat;
 				background-position:center;
-			}
-
-			.catype-title{
-				font-weight:bold;
 				margin-top:10px;
 			}
 			
 			.category-box {
-				margin-top:3px;
 				padding:3px;
+				padding-left:10px;
 				border-style:solid;
-				border-width:3px;
+				border-width:0px;
 				border-color:rgb(230,230,230);
-				overflow:hidden;
 				position:relative;
-				border-radius:6px;
 			}
 			
 			.category-title {
-				color:rgb(230,230,230);
+				color:#999999;
 			}
 			
 			.category-title + a, .category-title + a + a {
+				border-style:solid;
+				border-width:1px;
+				border-color:#dddddd;
+				background-color:#dddddd;
 				position:absolute;
-				top:3px;
-				bottom:3px;
-				right:3px;
+				top:2px;
+				right:10px;
+				bottom:2px;
+				width:18px;
+				border-radius:5px;
 			}
 			
+			/*a:empty, click to select a+a:selected, click to unselect*/
 			.category-title + a{
 				display:block;
-				background-color:rgb(100,240,100);
 				text-decoration:none;
 				color:white;
-				padding-right:4px;
-				padding-left:4px;
-				border-radius:10px;
 				font-weight:bold;
 			}
 		
 			.category-title + a + a {
 				display:none;
-				background-color:rgb(240,100,100);
 				text-decoration:none;
 				color:white;
-				padding-right:4px;
-				padding-left:4px;
-				border-radius:10px;
 				font-weight:bold;
-				transform:rotate(45deg);
-				-ms-transform:rotate(45deg); /* IE 9 */
-				-webkit-transform:rotate(45deg); /* Opera, Chrome, and Safari */
 			}
 			
 			.category-title[data-selected]{
-				color:rgb(100,120,100);
+				color:#000000;
 			}
 			
 			.category-title[data-selected] + a{
@@ -350,7 +450,84 @@ $medium_gray_color = "#aaaaaa";
 			
 			.category-title[data-selected] + a + a{
 				display:block;
+				background-color:<?php print($selected_checkbox_color) ?>;
+				border-color:<?php print($selected_checkbox_color) ?>;
+				background-image:url(checkmark.png);
+				background-size:auto 90%;
+				background-repeat:no-repeat;
+				background-position:center;
 			}
+			
+			.cart-product-name{
+				width:70%;
+				min-height:50px;
+				margin-bottom:5px;
+			}
+			
+			.remove-cart-link{
+				position:absolute;
+				top:5px;
+				right:5px;
+				width:20px;
+				height:20px;
+				border-style:solid;
+				border-width:1px;
+				border-color:<?php print($medium_gray_color); ?>;
+				border-radius:11px;
+				background-image:url(redx.png);
+				background-position:center;
+				background-size:100% auto;
+				background-repeat:no-repeat;
+				background-color:white;
+				
+			}
+			
+			.cart-price{
+				text-align:right;
+				position:absolute;
+				bottom:10px;
+				right:10px;
+			}
+			
+			.cart-calculation{
+				color:<?php print($light_gray_color); ?>;
+			}
+			
+			.increment-link, .decrement-link {
+				display:inline-block;
+				width:16px;
+				height:16px;
+				background-position:center;
+				background-repeat:no-repeat;
+				background-size:90% auto;
+				vertical-align:middle;
+				border-radius:5px;
+				background-color:black;
+			}
+			
+			.increment-link{
+				margin-left:5px;
+				background-image:url(plus.png)
+			}
+			
+			.decrement-link {
+				margin-left:5px;
+				background-image:url(minus.png)
+			}
+			
+			.carrito{
+				display:inline-block;
+				width:35px;
+				height:35px;
+				background-image:url(cart.png);
+				background-position:center;
+				background-size:100% auto;
+				background-repeat:no-repeat;
+				vertical-align:middle;
+				margin-top:-7px;
+				margin-right:5px;
+			}
+			
 </style>
 <?php
 
@@ -389,13 +566,9 @@ $medium_gray_color = "#aaaaaa";
 		"params"=>array("type"=>"submit","value"=>"")
 	));
 	$searchTextBoxContainer->addChildElement(array($searchTextBox,$searchButton));
-	$hiddenFieldArray = HTMLElement::hiddenInputs(Helper::arrayMinusKeys($local_data,array("q")));
-	/*$searchHiddenField = new HTMLElement(array(
-		"tag"=>"input",
-		"params"=>array("type"=>"hidden","name"=>"cats","value"=>implode(",",$categoryIdArray))
-	));*/
 	$searchForm->addChildElement(array($searchTextBoxContainer));
-	$searchForm->addChildElement($hiddenFieldArray);
+	//$hiddenFieldArray = HTMLElement::hiddenInputs(Helper::arrayMinusKeys($local_data,array("q")));
+	//$searchForm->addChildElement($hiddenFieldArray);
 	
 	
 	//Top banner
@@ -432,8 +605,7 @@ $medium_gray_color = "#aaaaaa";
 			"tag"=>"div",
 		));
 		$catypeTitle = new HTMLElement(array(
-			"tag"=>"div",
-			"params"=>array("class"=>"catype-title"),
+			"tag"=>"h3",
 			"inside"=>$catype["name"]
 		));
 		$catypeBox->addChildElement($catypeTitle);
@@ -459,6 +631,11 @@ $medium_gray_color = "#aaaaaa";
 			}
 		}*/
 		
+		$categorySet = new HTMLElement(array(
+			"tag"=>"div",
+			"params"=>array("class"=>"category-set")
+		));
+		
 		$num_good_categories = 0;
 		for ($j=0;$j<$num_categories;$j+=1){
 			$category = $categories[$j];
@@ -472,7 +649,7 @@ $medium_gray_color = "#aaaaaa";
 				"tag"=>"div",
 				"params"=>array("class"=>"category-box")
 			));
-			$catypeBox->addChildElement($categoryBox);
+			$categorySet->addChildElement($categoryBox);
 			
 			$titleParams = array();
 			
@@ -491,16 +668,17 @@ $medium_gray_color = "#aaaaaa";
 			$categoryAddLink = new HTMLElement(array(
 				"tag" => "a",
 				"params" => array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("cats"=>implode(",",Helper::arrayUnion($multiple?$categoryIdArray:$other_category_ids,array($category["id"]))))))),
-				"inside" => "+"
+				//"inside" => "+"
 			));
 			
 			$categoryRemoveLink = new HTMLElement(array(
 				"tag" => "a",
 				"params" => array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("cats"=>implode(",",array_diff($categoryIdArray,array($category["id"]))))))),
-				"inside" => "+"
+				//"inside" => "+"
 			));
 			$categoryBox->addChildElement(array($categoryTitle,$categoryAddLink,$categoryRemoveLink));
 		}
+		$catypeBox->addChildElement($categorySet);
 		if ($num_good_categories>0){
 			$searchFilters->addChildElement($catypeBox);
 		}
@@ -524,23 +702,34 @@ $medium_gray_color = "#aaaaaa";
 		));
 		$productName = new HTMLElement(array(
 			"tag"=>"h3",
-			"inside"=>$product["name"]
+			"params"=>array("class"=>"product-name"),
+			"inside"=>htmlentities($product["name"])
 		));
-		$productDescription = new HTMLElement(array(
-			"tag"=>"div",
-			"inside"=>$product["description"],
-			"param"=>array("class"=>"product-description")
+		$productPrice = new HTMLElement(array(
+			"tag"=>"h3",
+			"params"=>array("class"=>"product-price"),
+			"inside"=>"&nbsp;Bs. ".$product["price"]
 		));
-		$productElement->addChildElement(array($productThumbnail,$productName,$productDescription));
-		if (!Helper::array_path_exists(array("cart",NULL,"product_id",$product["id"]),$_SESSION)){
+// 		$productDescription = new HTMLElement(array(
+// 			"tag"=>"div",
+// 			"inside"=>$product["description"],
+// 			"param"=>array("class"=>"product-description")
+// 		));
+		$productElement->addChildElement(array($productThumbnail,$productName,$productPrice));
+		if (Helper::array_path_exists(array("cart",NULL,"product_id",$product["id"]),$_SESSION)){
+			$urlString = "";
+			$addClass = "cart-link-no";
+		}else{
 			$uniqueAddId = Holo::updateActionDictionary($action_dict,array("key"=>"add-product-to-cart","param"=>$product["id"]));
-			$productAddLink = new HTMLElement(array(
-				"tag" => "a",
-				"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueAddId)))),
-				"inside"=>"[agregar]"
-			));
-			$productElement->addChildElement($productAddLink);
+			$urlString = Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueAddId)));
+			$addClass = "cart-link";
 		}
+		$productAddLink = new HTMLElement(array(
+			"tag" => "a",
+			"params"=>array("class"=>$addClass,"href"=>"?".$urlString),
+			"inside"=>""
+		));
+		$productElement->addChildElement($productAddLink);
 		$productList->addChildElement($productElement);
 	}
 	
@@ -553,7 +742,7 @@ $medium_gray_color = "#aaaaaa";
 	
 	$cartTitle = new HTMLElement(array(
 		"tag"=>"h2",
-		"inside"=>"Carrito"
+		"inside"=>"<div class='carrito'></div>Carrito"
 	));
 	
 	$rightColumn->addChildElement($cartTitle);
@@ -562,41 +751,55 @@ $medium_gray_color = "#aaaaaa";
 		foreach($cartItems as $item){
 			if ($product = DB::getProductById($item["product_id"])){
 				$productElement = new HTMLElement(array(
-					"tag"=>"div",
-					"inside"=>$product["name"]
+					"tag"=>"div"
 				));
+				//NAME
+				$productName = new HTMLElement(array(
+					"tag"=>"div",
+					"inside"=>htmlentities($product["name"]),
+					"params"=>array("class"=>"cart-product-name")
+				));
+				$productElement->addChildElement($productName);
+				//COUNT
+				$countElement = new HTMLElement(array(
+					"tag"=>"span",
+					"inside"=>"(".$item["count"]." art&iacute;culo".(($item["count"]==1)?"":"s").")"
+				));
+				$productElement->addChildElement($countElement);
 				//DECREMENT
 				if ($item["count"]>1){
 					$uniqueDecrementId = Holo::updateActionDictionary($action_dict,array("key"=>"decrement-product-in-cart","param"=>$product["id"]));
 					$productDecrementLink = new HTMLElement(array(
 						"tag" => "a",
-						"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueDecrementId)))),
-						"inside"=>"[-]"
+						"params"=>array("class"=>"decrement-link","href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueDecrementId)))),
+						"inside"=>""
 					));
 					$productElement->addChildElement($productDecrementLink);
 				}
-				//COUNT
-				$countElement = new HTMLElement(array(
-					"tag"=>"span",
-					"inside"=>$item["count"]
-				));
-				$productElement->addChildElement($countElement);
 				//INCREMENT
 				$uniqueIncrementId = Holo::updateActionDictionary($action_dict,array("key"=>"increment-product-in-cart","param"=>$product["id"]));
 				$productIncrementLink = new HTMLElement(array(
 					"tag" => "a",
-					"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueIncrementId)))),
-					"inside"=>"[+]"
+					"params"=>array("class"=>"increment-link","href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueIncrementId)))),
+					"inside"=>""
 				));
 				$productElement->addChildElement($productIncrementLink);
 				//REMOVE
 				$uniqueRemoveId = Holo::updateActionDictionary($action_dict,array("key"=>"remove-product-from-cart","param"=>$product["id"]));
 				$productRemoveLink = new HTMLElement(array(
 					"tag" => "a",
-					"params"=>array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueRemoveId)))),
-					"inside"=>"[remover]"
+					"params"=>array("class"=>"remove-cart-link","href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueRemoveId)))),
+					"inside"=>""
 				));
 				$productElement->addChildElement($productRemoveLink);
+				
+				//PRICE
+				$productPriceElement = new HTMLElement(array(
+					"tag"=>"div",
+					"params"=>array("class"=>"cart-price"),
+					"inside"=>(($item["count"]==1)?"":"<span class='cart-calculation'>".$item["count"]." x ".$product["price"]." =</span><br/>")."Bs. ".($product["price"]*$item["count"])
+				));
+				$productElement->addChildElement($productPriceElement);
 				
 				//Add product
 				$rightColumn->addChildElement($productElement);
@@ -604,7 +807,14 @@ $medium_gray_color = "#aaaaaa";
 		}
 	}
 	
-	$body->addChildElement(array($topBanner,$searchFilters,$rightColumn,$productList));
+	$contentBody = new HTMLElement(array(
+		"tag"=>"div",
+		"params"=>array("id"=>"content-body")
+	));
+	
+	$contentBody->addChildElement(array($searchFilters,$rightColumn,$productList));
+	
+	$body->addChildElement(array($topBanner,$contentBody));
 	
 	
 	$_SESSION["actions"] = $action_dict;
