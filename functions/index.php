@@ -23,13 +23,13 @@
 	//var_dump($_SESSION);
 	
 	//Dictionary of hash=>array("key"=>key,"param"=>string_param)
-	$action_dict = Helper::getArrayValue($_SESSION,"actions",array());
+	$action_dict = Helper::getSessionValue("actions",array());
 	
 	$action_functions = array(
 		"add-product-to-cart" => (function($product_id){
 			//echo "f1";
 			//exit;
-			$cart_products = Helper::getArrayValue($_SESSION,"cart",array());
+			$cart_products = Helper::getSessionValue("cart",array());
 			$index = -1;
 			foreach($cart_products as $i=>$value){
 				if ($value["product_id"]===$product_id){
@@ -40,11 +40,12 @@
 				$cart_products[] = array("product_id"=>$product_id,"count"=>1);
 			}
 			$_SESSION["cart"] = $cart_products;
+			unset($_SESSION["shipping-price"]);
 		}),
 		"remove-product-from-cart" => (function($product_id){
 			//echo "f2";
 			//exit;
-			$cart_products = Helper::getArrayValue($_SESSION,"cart",array());
+			$cart_products = Helper::getSessionValue("cart",array());
 			$index = -1;
 			foreach($cart_products as $i=>$value){
 				if ($value["product_id"]===$product_id){
@@ -55,11 +56,12 @@
 				array_splice($cart_products, $index, 1);
 			}
 			$_SESSION["cart"] = $cart_products;
+			Holo::unsetShippingPrice();
 		}),
 		"decrement-product-in-cart" => (function($product_id){
 			//echo "f2";
 			//exit;
-			$cart_products = Helper::getArrayValue($_SESSION,"cart",array());
+			$cart_products = Helper::getSessionValue("cart",array());
 			$product = FALSE;
 			$index = -1;
 			foreach($cart_products as $i=>$value){
@@ -77,11 +79,12 @@
 				}
 			}
 			$_SESSION["cart"] = $cart_products;
+			Holo::unsetShippingPrice();
 		}),
 		"increment-product-in-cart" => (function($product_id){
 			//echo "f2";
 			//exit;
-			$cart_products = Helper::getArrayValue($_SESSION,"cart",array());
+			$cart_products = Helper::getSessionValue("cart",array());
 			$product = FALSE;
 			$index = -1;
 			foreach($cart_products as $i=>$value){
@@ -95,6 +98,57 @@
 				$cart_products[$index] = $product;
 			}
 			$_SESSION["cart"] = $cart_products;
+			Holo::unsetShippingPrice();
+		}),
+		"calculate-shipping" => (function(){
+			global $action_dict, $local_data;
+			if (($user = Holo::currentUser()) !== FALSE){
+				if (($shippingArea = Holo::currentShippingArea()) !== FALSE){
+					Holo::computeShippingPrice();
+				}else{
+					$uniqueShippingId = Holo::updateActionDictionary($action_dict,array("key"=>"calculate-shipping","param"=>"1"));
+					$url = "../?".Helper::urlData(Helper::updatedArray(Helper::arrayMinusKeys($local_data,array("action")),array("action"=>$uniqueShippingId)));
+					$uniqueURLId = Holo::saveURL($url);
+					$_SESSION["actions"] = $action_dict;
+					header("Location: destino/?".Helper::urlData(array("url"=>$uniqueURLId)));
+					exit;
+				}	
+			}else{
+				$uniqueShippingId = Holo::updateActionDictionary($action_dict,array("key"=>"calculate-shipping","param"=>"1"));
+				$url = "../?".Helper::urlData(Helper::updatedArray(Helper::arrayMinusKeys($local_data,array("action")),array("action"=>$uniqueShippingId)));
+				$uniqueURLId = Holo::saveURL($url);
+				$_SESSION["actions"] = $action_dict;
+				header("Location: entrar/?".Helper::urlData(array("url"=>$uniqueURLId)));
+				exit;
+			}
+		}),
+		"check-out" => (function(){
+			global $action_dict, $local_data;
+			if (($user = Holo::currentUser()) !== FALSE){
+				if (($shippingArea = Holo::currentShippingArea()) !== FALSE){
+					Holo::computeShippingPrice();
+					$_SESSION["actions"] = $action_dict;
+					header("Location: comprar/");
+					exit;
+				}else{
+					$uniqueCheckOutId = Holo::updateActionDictionary($action_dict,array("key"=>"check-out","param"=>"1"));
+					$url = "../?".Helper::urlData(Helper::updatedArray(Helper::arrayMinusKeys($local_data,array("action")),array("action"=>$uniqueCheckOutId)));
+					$uniqueURLId = Holo::saveURL($url);
+					$_SESSION["actions"] = $action_dict;
+					header("Location: destino/?".Helper::urlData(array("url"=>$uniqueURLId)));
+					exit;
+				}	
+			}else{
+				$uniqueCheckOutId = Holo::updateActionDictionary($action_dict,array("key"=>"check-our","param"=>"1"));
+				$url = "../?".Helper::urlData(Helper::updatedArray(Helper::arrayMinusKeys($local_data,array("action")),array("action"=>$uniqueCheckOutId)));
+				$uniqueURLId = Holo::saveURL($url);
+				$_SESSION["actions"] = $action_dict;
+				header("Location: entrar/?".Helper::urlData(array("url"=>$uniqueURLId)));
+				exit;
+			}
+		}),
+		"log-out" => (function(){
+			Holo::logOut();
 		})
 		
 	);
@@ -117,14 +171,59 @@
 	
 	//Helper::updateActionDictionary($action_dict,);
 	
+	$allCats = DB::getAllCategories();
+	$allCatypes = $allCats["catypes"];
+	$allCategories = $allCats["categories"];
+	$allCatStructure = $allCats["structure"];
 	
-	$categoryIdArray = array_key_exists("cats",$local_data)?DB::categoryIdsFromString($local_data["cats"]):array();
-	$categoryIdBooleanArray = Helper::getBooleanArray($categoryIdArray);
+	$categoryString = Helper::getArrayValue($local_data,"c","");
+
+	$categoryIdArray = DB::catypeAndCategoryIdsFromString($categoryString,$allCats);
+	$categoryIdYesArray = $categoryIdArray["yes"];
+	$categoryIdNoArray = $categoryIdArray["no"];
+	
+	//var_dump($categoryIdArray);
+	
+	//exit;
+	
+	
+	//$categoryIdArray = array_key_exists("cats",$local_data)?DB::categoryIdsFromString($local_data["cats"]):array();
+	//$categoryIdBooleanArray = Helper::getBooleanArray($categoryIdArray);
+	$categoryIdBooleanArray = array();
+	
+	
+	foreach ($allCatStructure as $catype_id=>$category_ids){
+		if (array_key_exists($catype_id,$categoryIdYesArray)){
+			$filtered_category_ids = $categoryIdYesArray[$catype_id];
+			$categoryIdBooleanArray[-$catype_id] = FALSE;
+			foreach($category_ids as $category_id){
+				$categoryIdBooleanArray[$category_id] = in_array($category_id,$filtered_category_ids);
+			}
+		}elseif (array_key_exists($catype_id,$categoryIdNoArray)){
+			//echo("<br><br>catype $catype_id in NoArray<br><br>");
+			$filtered_category_ids = $categoryIdNoArray[$catype_id];
+			//var_dump($filtered_category_ids);
+			$categoryIdBooleanArray[-$catype_id] = TRUE;
+			foreach($category_ids as $category_id){
+				$value = !in_array($category_id,$filtered_category_ids);
+				//echo("<br><br>catype $category_id SET TO $value<br><br>");
+				$categoryIdBooleanArray[$category_id] = $value;
+			}
+		}
+		//echo("($catype_id)($filtered_category_ids)");
+	}
+	
+	//var_dump($categoryIdBooleanArray);
+	//exit;
+	
 	$q = array_key_exists("q",$local_data)?$local_data["q"]:"";
 	$resultLimit = 1000;
 	$resultOffset = 0;
 	
 	$products = DB::getProducts($q,$categoryIdArray,$resultLimit,$resultOffset);
+	
+	//var_dump($products);
+	//exit;
 	
 	$existingCategoriesBooleanArray = array();
 	
@@ -158,7 +257,8 @@ $search_bar_button_padding = 0;
 $search_corner_radius = 4;
 
 $almost_white_color = "#fdfdfd";
-$very_light_gray_color = "#f3f3f3";
+$very_light_gray_color = "rgb(243,243,243)";
+$very_light_gray_trans_color = "rgba(243,243,243,0.7)";
 
 $light_gray_color = "#cccccc";
 
@@ -169,9 +269,12 @@ $selected_checkbox_color = "#44cc66";
 $product_padding = 30;
 $top_product_padding = 30;
 
-$top_bar_height = 60;
+$top_bar_height = 80;
+$top_bar_bottom_margin = 10;
 $filters_width = 170;
 $cart_width = 250;
+
+$logo_width = 200;
 
 
 
@@ -190,12 +293,20 @@ $cart_width = 250;
 			}
 
 			h1{
-				display:inline;
+				display:inline-block;
 				border:0px;
 				padding:0px;
 				margin:0px;
 				margin-right:10px;
 				font-weight:normal;
+				color:rgba(0,0,0,0);
+				background-image:url(logo.png);
+				background-position:center;
+				background-size:contain;
+				background-repeat:no-repeat;
+				height:<?php print($top_bar_height); ?>px;
+				width:<?php print($logo_width); ?>px;
+				vertical-align:middle;
 			}
 			
 			h2{
@@ -220,9 +331,36 @@ $cart_width = 250;
 			}
 			
 			#top-banner{
-				padding:10px;
+				position:fixed;
+				padding:0px;
+				top:0px;
+				left:0px;
+				right:0px;
 				height:<?php print($top_bar_height); ?>px;
+				background-color:<?php print($very_light_gray_color); ?>;
+				z-index:50;
+				box-shadow: 0px 3px 3px <?php print($very_light_gray_color); ?>;
+				-webkit-box-shadow: 0px 3px 3px <?php print($very_light_gray_color); ?>;
+				-moz-box-shadow: 0px 3px 3px <?php print($very_light_gray_color); ?>;
 			}
+			
+			#top-right-bar{
+				position:fixed;
+				top:10px;
+				right:10px;
+				padding:10px;
+				z-index:1000;
+				font-family:"HelveticaNeue-Medium"
+			}
+			
+			a{
+				text-decoration:none;
+			}
+			
+			a:link{color:rgba(50,70,200,1)}
+			a:active{color:rgba(50,70,200,1)}
+			a:visited{color:rgba(50,70,200,1)}
+			a:hover{color:rgba(50,70,200,1)}
 			
 			form{display:inline;margin:0px;padding:0px;border:0px;}
 			
@@ -231,6 +369,7 @@ $cart_width = 250;
 				/*background-color:blue;*/
 				position:relative;
 				display:inline-block;
+				vertical-align:middle;
 				height:<?php print($search_bar_height); ?>px;
 				width:<?php print($search_bar_width+$search_button_width+$search_bar_button_padding); ?>px;
 			}
@@ -284,7 +423,7 @@ $cart_width = 250;
 			#filters{
 				position:absolute;
 				left:0px;
-				top:<?php print($top_bar_height); ?>px;
+				top:<?php print($top_bar_height+$top_bar_bottom_margin); ?>px;
 				width:<?php print($filters_width); ?>px;
 				margin-right:<?php print($product_padding/2); ?>px;
 			}
@@ -293,7 +432,7 @@ $cart_width = 250;
 			#right-column{
 				position:absolute;
 				right:0px;
-				top:<?php print($top_bar_height); ?>px;
+				top:<?php print($top_bar_height+$top_bar_bottom_margin); ?>px;
 				width:<?php print($cart_width); ?>px;
 				margin-left:<?php print($product_padding/2); ?>px;
 			}
@@ -326,7 +465,7 @@ $cart_width = 250;
 				position:absolute;
 				left:<?php print($filters_width); ?>px;
 				right:<?php print($cart_width); ?>px;
-				top:<?php print($top_bar_height); ?>px;
+				top:<?php print($top_bar_height+$top_bar_bottom_margin); ?>px;
 				min-height:500px;
 				text-align:center;
 				padding-bottom:20px;
@@ -373,7 +512,7 @@ $cart_width = 250;
 			}
 			
 			.cart-link,.cart-link-no{
-				z-index:100;
+				z-index:40;
 				position:absolute;
 				right:5px;
 				bottom:0px;
@@ -471,7 +610,7 @@ $cart_width = 250;
 				width:20px;
 				height:20px;
 				border-style:solid;
-				border-width:1px;
+				border-width:0px;
 				border-color:<?php print($medium_gray_color); ?>;
 				border-radius:11px;
 				background-image:url(redx.png);
@@ -528,6 +667,42 @@ $cart_width = 250;
 				margin-right:5px;
 			}
 			
+			.cart-total-container{
+				overflow:auto;
+			}
+			
+			.cart-subtotal-text{
+				clear:both;
+				float:left;
+			}
+			
+			.cart-subtotal-value{
+				clear:right;
+				float:right;
+			}
+			
+			.cart-buttons-wrapper{
+				clear:both;
+				position:relative;
+				padding-top:10px;
+			}
+			
+			.shipping-link{
+				display:block;
+				clear:both;
+				text-decoration:none;
+				color:white;
+				background-color:<?php print($medium_gray_color) ?>;
+				padding-top:10px;
+				padding-bottom:10px;
+				border-radius:6px;
+				text-align:center;
+			}
+			
+			.checkout-link{
+				background-color:rgb(50,200,50);
+			}
+			
 </style>
 <?php
 
@@ -543,7 +718,19 @@ $cart_width = 250;
 	$head = new HTMLElement("head");
 	$head->addChildElement(array(new HTMLElement(array("tag"=>"title","inside"=>"Hologramia")),$styleTag));
 	$document->addChildElement(array($doctype,$head,$body));
-	$head->addChildElement(new HTMLElement(array("tag"=>"title","inside"=>"Hologramia")));
+	
+// 	$url = $_SERVER['REQUEST_URI']; //returns the current URL
+// 	$parts = explode('/',$url);
+// 	$dir = $_SERVER['SERVER_NAME'];
+// 	for ($i = 0; $i < count($parts) - 1; $i++) {
+//  		$dir .= $parts[$i] . "/";
+// 	}
+// 	
+// 	$head->addChildElement(new HTMLElement(array(
+// 		"tag"=>"base",
+// 		"ends"=>FALSE,
+// 		"params"=>array("href"=>$dir)
+// 	)));
 	
 	
 	//Search bar
@@ -596,6 +783,8 @@ $cart_width = 250;
 	
 	$searchFilters->addChildElement($filterTitle);
 	
+	//THE CATEGORIES
+	
 	$catypes = DB::getAllCatypes();
 	$num_catypes = count($catypes);
 	for ($i=0;$i<$num_catypes;$i+=1){
@@ -616,7 +805,7 @@ $cart_width = 250;
 		foreach ($categories as $value){
 			$category_ids[] = $value["id"];
 		}
-		$other_category_ids = array_diff($categoryIdArray,$category_ids);
+		//$other_category_ids = array_diff($categoryIdArray,$category_ids);
 		$multiple = $catype["allows_multiple"];
 		
 		/*if (!$multiple){
@@ -667,17 +856,58 @@ $cart_width = 250;
 			
 			$categoryAddLink = new HTMLElement(array(
 				"tag" => "a",
-				"params" => array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("cats"=>implode(",",Helper::arrayUnion($multiple?$categoryIdArray:$other_category_ids,array($category["id"]))))))),
+				"params" => array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("c"=>Holo::categoryStringByAdding($category["id"],$categoryIdArray,$allCats,$categoryString))))),
 				//"inside" => "+"
 			));
 			
 			$categoryRemoveLink = new HTMLElement(array(
 				"tag" => "a",
-				"params" => array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("cats"=>implode(",",array_diff($categoryIdArray,array($category["id"]))))))),
+				"params" => array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("c"=>Holo::categoryStringByRemoving($category["id"],$categoryIdArray,$allCats,$categoryString))))),
 				//"inside" => "+"
 			));
 			$categoryBox->addChildElement(array($categoryTitle,$categoryAddLink,$categoryRemoveLink));
 		}
+		$num_good_categories += 1;
+		$otherCategoryBox = new HTMLElement(array(
+			"tag"=>"div",
+			"params"=>array("class"=>"category-box")
+		));
+		$categorySet->addChildElement($otherCategoryBox);
+			
+		$otherTitleParams = array();
+			
+		if (Helper::arrayKeyIsTRUE(-$catype["id"],$categoryIdBooleanArray)){
+			$otherTitleParams["data-selected"] = "TRUE";
+		}/*else{
+			echo("<br><br><br><br><br>");
+			echo("[".$catype["id"]."][");
+			var_dump($categoryIdBooleanArray);
+			echo("]<br><br><br><br><br>");
+		}*/
+		
+					
+		$otherTitleParams["class"] = "category-title";
+			
+		$otherCategoryTitle = new HTMLElement(array(
+			"tag" => "span",
+			"params" => $otherTitleParams,
+			"inside" => "Otros"
+		));
+			
+		$otherCategoryAddLink = new HTMLElement(array(
+			"tag" => "a",
+			"params" => array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("c"=>Holo::categoryStringByAdding(-$catype["id"],$categoryIdArray,$allCats,$categoryString))))),
+				//"inside" => "+"
+		));
+		
+		$otherCategoryRemoveLink = new HTMLElement(array(
+			"tag" => "a",
+			"params" => array("href"=>"?".Helper::urlData(Helper::updatedArray($local_data,array("c"=>Holo::categoryStringByRemoving(-$catype["id"],$categoryIdArray,$allCats,$categoryString))))),
+				//"inside" => "+"
+		));
+		
+		$otherCategoryBox->addChildElement(array($otherCategoryTitle,$otherCategoryAddLink,$otherCategoryRemoveLink));
+		
 		$catypeBox->addChildElement($categorySet);
 		if ($num_good_categories>0){
 			$searchFilters->addChildElement($catypeBox);
@@ -747,7 +977,8 @@ $cart_width = 250;
 	
 	$rightColumn->addChildElement($cartTitle);
 	
-	if ($cartItems = Helper::getArrayValue($_SESSION,"cart",FALSE)){
+	if ($cartItems = Helper::getSessionValue("cart",FALSE)){
+		$totalPrice = 0;
 		foreach($cartItems as $item){
 			if ($product = DB::getProductById($item["product_id"])){
 				$productElement = new HTMLElement(array(
@@ -794,10 +1025,12 @@ $cart_width = 250;
 				$productElement->addChildElement($productRemoveLink);
 				
 				//PRICE
+				$currentPrice = $product["price"]*$item["count"];
+				$totalPrice += $currentPrice;
 				$productPriceElement = new HTMLElement(array(
 					"tag"=>"div",
 					"params"=>array("class"=>"cart-price"),
-					"inside"=>(($item["count"]==1)?"":"<span class='cart-calculation'>".$item["count"]." x ".$product["price"]." =</span><br/>")."Bs. ".($product["price"]*$item["count"])
+					"inside"=>(($item["count"]==1)?"":"<span class='cart-calculation'>".$item["count"]." x ".$product["price"]." =</span><br/>")."Bs. ".$currentPrice
 				));
 				$productElement->addChildElement($productPriceElement);
 				
@@ -805,6 +1038,103 @@ $cart_width = 250;
 				$rightColumn->addChildElement($productElement);
 			}
 		}
+		
+		$totalElement = new HTMLElement(array(
+			"tag"=>"div",
+			"params"=>array("class"=>"cart-total-container")
+		));
+		
+		$subtotalText = new HTMLElement(array(
+			"tag"=>"div",
+			"inside"=>"Subtotal:",
+			"params"=>array("class"=>"cart-subtotal-text")
+		));
+		
+		$subtotalValue = new HTMLElement(array(
+			"tag"=>"div",
+			"inside"=>"Bs. ".$totalPrice,
+			"params"=>array("class"=>"cart-subtotal-value")
+		));
+		
+		$totalElement->addChildElement(array($subtotalText,$subtotalValue));
+		
+		
+		
+		if (($shipping = Holo::currentShippingPrice()) !== FALSE){
+			
+			$shippingText = new HTMLElement(array(
+				"tag"=>"div",
+				"inside"=>"Env&iacute;o:",
+				"params"=>array("class"=>"cart-subtotal-text")
+			));
+		
+			$shippingValue = new HTMLElement(array(
+				"tag"=>"div",
+				"inside"=>"Bs. ".$shipping,
+				"params"=>array("class"=>"cart-subtotal-value")
+			));
+			
+			$totalText = new HTMLElement(array(
+				"tag"=>"div",
+				"inside"=>"Total:",
+				"params"=>array("class"=>"cart-subtotal-text")
+			));
+		
+			$totalValue = new HTMLElement(array(
+				"tag"=>"div",
+				"inside"=>"Bs. ".($totalPrice+$shipping),
+				"params"=>array("class"=>"cart-subtotal-value")
+			));
+			
+			$totalElement->addChildElement(array($shippingText,$shippingValue,$totalText,$totalValue));
+			
+		}else{
+			
+			$linkWrapper = new HTMLElement(array(
+				"tag"=>"div",
+				"params"=>array("class"=>"cart-buttons-wrapper")
+			));
+			$uniqueShippingId = Holo::updateActionDictionary($action_dict,array("key"=>"calculate-shipping","param"=>""));
+			$urlString = Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueShippingId)));
+			
+			$shippingLink = new HTMLElement(array(
+				"tag"=>"a",
+				"inside"=>"Calcular precio del env&iacute;o",
+				"params"=>array("class"=>"shipping-link","href"=>"?".$urlString)
+			));
+			
+			
+			
+			$linkWrapper->addChildElement($shippingLink);
+			$totalElement->addChildElement($linkWrapper);
+			
+		}
+		
+		$linkWrapper = new HTMLElement(array(
+			"tag"=>"div",
+			"params"=>array("class"=>"cart-buttons-wrapper")
+		));
+		
+		$uniqueCheckOutId = Holo::updateActionDictionary($action_dict,array("key"=>"check-out","param"=>""));
+		$urlString = Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueCheckOutId)));
+		$checkoutLink = new HTMLElement(array(
+			"tag"=>"a",
+			"inside"=>"Finalizar compra :)",
+			"params"=>array("class"=>"shipping-link checkout-link","href"=>"?".$urlString)
+		));
+		
+		$linkWrapper->addChildElement($checkoutLink);
+		$totalElement->addChildElement($linkWrapper);
+		
+		
+		
+		
+		
+		
+		
+		
+		$rightColumn->addChildElement($totalElement);
+		
 	}
 	
 	$contentBody = new HTMLElement(array(
@@ -816,6 +1146,52 @@ $cart_width = 250;
 	
 	$body->addChildElement(array($topBanner,$contentBody));
 	
+// 	$body->addChildElement(new HTMLElement(array(
+// 		"inside"=>"<div style='position:fixed;z-index:1000;top:5px;right:5px;'>Contacto:<br/>02123393608<br/>justo@hologramia.com</div>"
+// 	)));
+
+	if (($currentUser=Holo::currentUser()) !== FALSE){
+		$logout = new HTMLElement(array(
+			"tag"=>"div",
+			"params"=>array("id"=>"top-right-bar"),
+			"inside"=>"Conectado como ".htmlentities($currentUser["name"])."&nbsp;-&nbsp"
+		));
+		
+		$uniqueLogoutId = Holo::updateActionDictionary($action_dict,array("key"=>"log-out","param"=>""));
+		$urlString = Helper::urlData(Helper::updatedArray($local_data,array("action"=>$uniqueLogoutId)));
+		
+		$logoutLink = new HTMLElement(array(
+			"tag"=>"a",
+			"params"=>array("href"=>"?".$urlString),
+			"inside"=>"desconectarse"
+		));
+		$logout->addChildElement($logoutLink);
+		$body->addChildElement($logout);
+	}else{
+		$login = new HTMLElement(array(
+			"tag"=>"div",
+			"params"=>array("id"=>"top-right-bar")
+		));
+		
+		$loginLink = new HTMLElement(array(
+			"tag"=>"a",
+			"params"=>array("href"=>"entrar/"),
+			"inside"=>"entrar con tu cuenta"
+		));
+		
+		$separator = new HTMLElement(array(
+			"inside"=>"&nbsp;-&nbsp;"
+		));
+		
+		$registerLink = new HTMLElement(array(
+			"tag"=>"a",
+			"params"=>array("href"=>"unirse/"),
+			"inside"=>"unirse"
+		));
+		$login->addChildElement(array($loginLink,$separator,$registerLink));
+		$body->addChildElement($login);
+		
+	}
 	
 	$_SESSION["actions"] = $action_dict;
 	

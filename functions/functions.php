@@ -4,6 +4,119 @@
 require_once("con.php");
 
 class Holo {
+
+	public static function logOut()
+	{
+		unset($_SESSION["user"]);
+		unset($_SESSION["cart"]);
+		unset($_SESSION["shipping-area"]);
+		unset($_SESSION["shipping-price"]);
+	}
+
+	public static function unsetShippingPrice()
+	{
+		unset($_SESSION["shipping-price"]);
+	}
+
+	public static function computeShippingPrice()
+	{
+		$_SESSION["shipping-price"] = 50;
+	}
+
+	public static function updateShippingArea($area)
+	{
+		$_SESSION["shipping-area"] = $area;
+	}
+
+	public static function currentShippingArea()
+	{
+		return Helper::getSessionValue("shipping-area",FALSE);
+	}
+	
+	public static function createAccount($name,$email,$pass)
+	{
+		//$hash = password_hash($pass, PASSWORD_DEFAULT);
+		$hash = $pass;
+		
+		$user = DB::getUserByIdentifier($email);
+		
+		if ($user !== FALSE){
+			return FALSE;
+		}
+		
+		if (($old = Helper::getArrayValue($_SESSION,"user",FALSE)) !== FALSE){
+			Holo::logOut();
+		}
+		
+		if (($id = DB::insertUser($name,$email,$hash)) !== FALSE && ($user = DB::getUserById($id)) !== FALSE){
+			$_SESSION["user"] = $user;
+			
+			return TRUE;
+		}else{
+			return FALSE;
+		}
+		
+	}
+	
+	public static function login($email,$pass)
+	{
+		//$hash = password_hash($pass, PASSWORD_DEFAULT);
+		
+		//echo("obtained hash $hash from pass $pass");
+		
+		$user = DB::getUserByIdentifier($email);
+		
+		if ($user===FALSE){
+			return FALSE;
+		}
+		
+		//if (!password_verify($pass,$user["password"])){
+		if ($pass !== $user["password"]){
+			//echo("Login failed because saved pass=".$user["password"]." and pass=$pass not not match!");
+			return FALSE;
+		}
+		
+		if (($old = Helper::getArrayValue($_SESSION,"user",FALSE)) !== FALSE){
+			Holo::logOut();
+		}
+		
+		$_SESSION["user"] = $user;
+		
+		return TRUE;
+	}
+
+	public static function userEmailExists($email)
+	{
+		return (DB::getUserByIdentifier($email) !== FALSE);
+	}
+
+	public static function saveURL($url)
+	{
+		$key = uniqid("url",TRUE);
+		$urls = Helper::getArrayValue($_SESSION,"urls",array());
+		$urls[$key] = $url;
+		$_SESSION["urls"] = $urls;
+		return $key;
+	}
+
+	public static function currentUser()
+	{
+		if (array_key_exists("user",$_SESSION)){
+			return $_SESSION["user"];
+		}else{
+			return FALSE;
+		}
+	}
+	
+	public static function currentShippingPrice()
+	{
+		if (array_key_exists("shipping-price",$_SESSION)){
+			return $_SESSION["shipping-price"];
+		}else{
+			return FALSE;
+		}
+	}
+
 	public static function updateActionDictionary(&$actionDict,$actionArray)
 	{
 		if (!($key = array_search($actionArray,$actionDict))){
@@ -13,9 +126,122 @@ class Holo {
 		
 		return $key;
 	}
+	
+	public static function categoryStringByAdding($id,$categoryIdArray,&$allCats,&$oldString)
+	{
+		if (array_key_exists($id,$allCats["categories"])){
+			$categoryNoArray = $categoryIdArray["no"];
+			$categoryYesArray = $categoryIdArray["yes"];
+			
+			$catype_id = $allCats["categories"][$id]["catype_id"];
+			
+			if (array_key_exists($catype_id,$categoryNoArray) && in_array($id,$categoryNoArray[$catype_id])){
+				Helper::removeArrayValue($categoryNoArray[$catype_id],$id);
+			}else if (array_key_exists($catype_id,$categoryYesArray) && !in_array($id,$categoryYesArray[$catype_id])){
+				$categoryYesArray[$catype_id][] = $id;
+			}
+			
+			return Holo::categoryStringFromIdArray(array("yes"=>$categoryYesArray,"no"=>$categoryNoArray));
+			
+		}elseif (array_key_exists(-$id,$allCats["catypes"])){
+			$catype_id = -$id;
+			$categoryNoArray = $categoryIdArray["no"];
+			$categoryYesArray = $categoryIdArray["yes"];
+			
+			if (array_key_exists($catype_id,$categoryYesArray)){
+				$yesArray = $categoryYesArray[$catype_id];
+				unset($categoryYesArray[$catype_id]);
+				$noArray = array();
+				$allCategories = $allCats["structure"][$catype_id];
+				foreach ($allCategories as $category_id){
+					if (!in_array($category_id,$yesArray)){
+						$noArray[] = $category_id;
+					}
+				}
+				$categoryNoArray[$catype_id] = $noArray;
+				
+				return Holo::categoryStringFromIdArray(array("yes"=>$categoryYesArray,"no"=>$categoryNoArray));
+			}
+		}
+		
+		return $oldString;
+		
+	}
+	
+	public static function categoryStringByRemoving($id,&$categoryIdArray,&$allCats,&$oldString)
+	{
+		if (array_key_exists($id,$allCats["categories"])){
+			$categoryNoArray = $categoryIdArray["no"];
+			$categoryYesArray = $categoryIdArray["yes"];
+			
+			$catype_id = $allCats["categories"][$id]["catype_id"];
+			
+			if (array_key_exists($catype_id,$categoryNoArray) && !in_array($id,$categoryNoArray[$catype_id])){
+				$categoryNoArray[$catype_id][] = $id;
+			}else if (array_key_exists($catype_id,$categoryYesArray) && in_array($id,$categoryYesArray[$catype_id])){
+				Helper::removeArrayValue($categoryYesArray[$catype_id],$id);
+				if (count($categoryYesArray[$catype_id])==0){
+					return $oldString;
+				}
+			}
+			
+			return Holo::categoryStringFromIdArray(array("yes"=>$categoryYesArray,"no"=>$categoryNoArray));
+			
+		}elseif (array_key_exists(-$id,$allCats["catypes"])){
+			$catype_id = -$id;
+			$categoryNoArray = $categoryIdArray["no"];
+			$categoryYesArray = $categoryIdArray["yes"];
+			
+			if (array_key_exists($catype_id,$categoryNoArray)){
+				$noArray = $categoryNoArray[$catype_id];
+				unset($categoryNoArray[$catype_id]);
+				$yesArray = array();
+				$allCategories = $allCats["structure"][$catype_id];
+				foreach ($allCategories as $category_id){
+					if (!in_array($category_id,$noArray)){
+						$yesArray[] = $category_id;
+					}
+				}
+				if (count($yesArray)>0){
+					$categoryYesArray[$catype_id] = $yesArray;
+					return Holo::categoryStringFromIdArray(array("yes"=>$categoryYesArray,"no"=>$categoryNoArray));
+				}
+			}
+		}
+		
+		return $oldString;
+	}
+	
+	public static function categoryStringFromIdArray($categoryIdArray){
+		$categoryNoArray = $categoryIdArray["no"];
+		$categoryYesArray = $categoryIdArray["yes"];
+		$result = array();
+		foreach ($categoryNoArray as $catype_id=>$categories){
+			$result[] = (-$catype_id).":".implode(",",$categories);
+		}
+		foreach ($categoryYesArray as $catype_id=>$categories){
+			$result[] = $catype_id.":".implode(",",$categories);
+		}
+		return implode(";",$result);
+	}
 }
 
 class Helper {
+
+	public static function unsetArrayValue(&$array, $value, $strict = TRUE)
+	{
+    	if(($key = array_search($value, $array, $strict)) !== FALSE) {
+        	unset($array[$key]);
+    	}
+	}
+
+	public static function removeArrayValue(&$array, $value, $strict = TRUE)
+	{
+    	if(($key = array_search($value, $array, $strict)) !== FALSE) {
+        	array_splice($array,$key,1);
+    	}
+	}
+
 	public static function arrayUnion($array,$array1)
 	{
 		$booleanArray = Helper::getBooleanArray($array);
@@ -47,10 +273,19 @@ class Helper {
 		return $array;
 	}
 
-	public static function getArrayValue($array,$key,$default)
+	public static function getArrayValue(&$array,$key,$default)
 	{
 		if (array_key_exists($key,$array)){
 			return $array[$key];
+		}
+		
+		return $default;
+	}
+	
+	public static function getSessionValue($key,$default)
+	{
+		if (array_key_exists($key,$_SESSION)){
+			return $_SESSION[$key];
 		}
 		
 		return $default;
@@ -264,6 +499,52 @@ class DB{
 
 //High level functions
 
+	public static function catypeAndCategoryIdsFromString($string,&$allCats)
+	{
+		$array = explode(";",$string);
+		$resultYes = array();
+		$resultNo = array();
+		foreach ($array as $catypeString){
+			//echo("<br><br>Analysing: $catypeString<br><br>");
+			$catypeObject = explode(":",$catypeString);
+			//var_dump($catypeObject);
+			$catypeObjectCount = count($catypeObject);
+			if ($catypeObjectCount==2){
+				$catypeId = $catypeObject[0]+0;
+				$yes = true;
+				if ($catypeId<0){
+					$yes = false;
+					$catypeId = -$catypeId;
+				}
+				//echo("<br><br>Catype id: $catypeId, yes:".($yes?"true":"false")."<br><br>");
+				if ($catype = Helper::getArrayValue($allCats["catypes"],$catypeId,FALSE)){
+					$categories = array();
+					$categoryIds = explode(",",$catypeObject[1]);
+					foreach($categoryIds as $value){
+						$id = $value+0;
+						if ($cat = Helper::getArrayValue($allCats["categories"],$id,FALSE)){
+							$categories[] = $id;
+						}
+					}
+				}
+				if ($yes){
+					$resultYes[$catypeId] = $categories;
+				}else{
+					$resultNo[$catypeId] = $categories;
+				}
+				
+			}
+			
+		}
+		$allCatypes = $allCats["catypes"];
+		foreach($allCatypes as $catype_id=>$value){
+			if (!array_key_exists($catype_id,$resultYes) && !array_key_exists($catype_id,$resultNo)){
+				$resultNo[$catype_id] = array();
+			}
+		}
+		return array("yes"=>$resultYes,"no"=>$resultNo);
+	}
+
 	public static function categoryIdsFromString($string)
 	{
 		$array = explode(",",$string);
@@ -313,6 +594,11 @@ class DB{
 	public static function getUserById($id)
 	{
 		return DB::getUniqueValue("user",array(),"id=?",array($id));
+	}
+
+	public static function getUserByIdentifier($identifier)
+	{
+		return DB::getUniqueValue("user",array(),"identifier=?",array($identifier));
 	}
 
 	public static function insertCategoryType($name, $allows_multiple)
@@ -395,23 +681,52 @@ class DB{
 		return DB::getValues("product_has_category",array(),"product_id=?",array($product_id));
 	}
 	
-	public static function getProducts($q,$categoryIdArray,$resultLimit,$resultOffset)
+	public static function getProducts($q,&$categoryIdArray,$resultLimit,$resultOffset)
 	{
 		//print("valueArray:<br/>");
 		//var_dump($categoryIdArray);
 	
-		$numCategories = count($categoryIdArray);
-		$whereText = "1";
-		for ($i=0;$i<$numCategories;$i+=1){
-			$where_i = "EXISTS (SELECT * FROM product_has_category AS table$i WHERE table$i.product_id=product.id AND table$i.category_id=?)";
-			if ($i==0){
-				$whereText = $where_i;
-			}else{
-				$whereText = $whereText." AND ".$where_i;
+		$categoryNoArray = $categoryIdArray["no"];
+		$categoryYesArray = $categoryIdArray["yes"];
+		
+		$numNoCatypes = count($categoryNoArray);
+		$numYesCatypes = count($categoryYesArray);
+
+		$filterArray = array();
+		$valueArray = array();
+		$i = 1;
+		
+		foreach ($categoryNoArray as $catype_id=>$categories){
+			$filterSubarray = array();
+			foreach ($categories as $category_id){
+				$filterSubarray[] = "NOT EXISTS (SELECT * FROM product_has_category as table$i WHERE table$i.product_id=product.id AND table$i.category_id=?)";
+				$valueArray[] = $category_id;
+				$i++;
+			}
+			if (count($filterSubarray)>0){
+				$filterArray[] = implode(" AND ",$filterSubarray);
 			}
 		}
 		
-		$valueArray = $categoryIdArray;
+		foreach ($categoryYesArray as $catype_id=>$categories){
+			$filterSubarray = array();
+			foreach ($categories as $category_id){
+				$filterSubarray[] = "EXISTS (SELECT * FROM product_has_category as table$i WHERE table$i.product_id=product.id AND table$i.category_id=?)";
+				$valueArray[] = $category_id;
+				$i++;
+			}
+			if (count($filterSubarray)>0){
+				$filterArray[] = implode(" OR ",$filterSubarray);
+			}
+		}
+		
+		$whereText = 1;
+		
+		if (count($filterArray)==1){
+			$whereText = $filterArray[0];
+		}else if (count($filterArray)>1){
+			$whereText = "(".implode(") AND (",$filterArray).")";
+		}
 		
 		if ($q != ""){
 			$whereText = "MATCH (product.text) AGAINST (? IN BOOLEAN MODE) AND ".$whereText;
@@ -419,6 +734,26 @@ class DB{
 		}
 		
 		$whereText = $whereText." LIMIT $resultOffset,$resultLimit";
+	
+// 		$numCategories = count($categoryIdArray);
+// 		$whereText = "1";
+// 		for ($i=0;$i<$numCategories;$i+=1){
+// 			$where_i = "EXISTS (SELECT * FROM product_has_category AS table$i WHERE table$i.product_id=product.id AND table$i.category_id=?)";
+// 			if ($i==0){
+// 				$whereText = $where_i;
+// 			}else{
+// 				$whereText = $whereText." AND ".$where_i;
+// 			}
+// 		}
+// 		
+// 		$valueArray = $categoryIdArray;
+// 		
+// 		if ($q != ""){
+// 			$whereText = "MATCH (product.text) AGAINST (? IN BOOLEAN MODE) AND ".$whereText;
+// 			$valueArray = array_merge(array($q),$valueArray);
+// 		}
+// 		
+// 		$whereText = $whereText." LIMIT $resultOffset,$resultLimit";
 		
 		
 		
@@ -695,7 +1030,30 @@ class DB{
 		}
 	}
 	
+	public static function getAllCategories(){
+		$resultStructure = array();
+		$resultCatypes = array();
+		$resultCategories = array();
+		$catypes = DB::getValues("catype,category",array("catype.id","category.id"),"catype.id=category.catype_id",array());
+		//var_dump($catypes);
+		//return;
+		foreach ($catypes as $value){
+			//var_dump($value);
+			$catype_id = $value["catype.id"];
+			$category_id = $value["category.id"];
+			if (!array_key_exists($catype_id,$resultStructure)){
+				$resultStructure[$catype_id] = array();
+				$resultCatypes[$catype_id] =  DB::getCategoryTypeById($catype_id);
+			}
+			$resultStructure[$catype_id][] = $category_id;
+			$resultCategories[$category_id] = DB::getCategoryById($category_id);
+		}
+		return array("structure"=>$resultStructure,"catypes"=>$resultCatypes,"categories"=>$resultCategories);
+	}
+	
 	public static function getValues($tableName,$valueArray,$whereStatement,$whereValues){
+	
+		$multipleTables = (strpos($tableName,",")!==false);
 	
 		$values = "*";
 		
@@ -767,8 +1125,7 @@ class DB{
         	$out = array();
 
        		while($field = mysqli_fetch_field($data)) {
-       			
-            	$fields[] = &$out[$field->name];
+            	$fields[] = &$out[$multipleTables?($field->table.".".$field->name):($field->name)];
         	}
         	
         	
