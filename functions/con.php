@@ -9,7 +9,7 @@ class CON{
 			return self::$connection;
 		}
 
-		$con = new mysqli("localhost", "root", "", "hologramia_schema");
+		$con = new mysqli("localhost", "root", "mysql", "hologramia_schema");
 		if ($con->connect_errno) {
 			$con = new mysqli("localhost", "root", "123", "hologramia_schema");
 			if ($con->connect_errno) {
