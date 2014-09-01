@@ -28,90 +28,16 @@
 		exit;
 	}
 	
-	$styleTag = new HTMLElement(array(
-		"insideFunction" => (function(){
-		
-		$search_bar_height = 35;
-		$search_bar_width = 300;
-		$search_button_width = 60;
-		$search_bar_button_padding = 0;
-
-		$search_corner_radius = 4;
-
-		$almost_white_color = "#fdfdfd";
-		$very_light_gray_color = "rgb(243,243,243)";
-		$very_light_gray_trans_color = "rgba(243,243,243,0.7)";
-
-		$light_gray_color = "#cccccc";
-
-		$medium_gray_color = "#aaaaaa";
-
-		$selected_checkbox_color = "#44cc66";
-
-		$product_padding = 30;
-		$top_product_padding = 30;
-
-		$top_bar_height = 80;
-		$top_bar_bottom_margin = 10;
-		$filters_width = 170;
-		$cart_width = 250;
-
-		$logo_width = 200;
-
-?>
-<style type="text/css">
-
-			body{
-				font-family:'HelveticaNeue-Light';
-				margin:0px;
-				padding:0px;
-				border:0px;
-				background-color:<?php print($very_light_gray_color); ?>;
-			}
-			
-			.main{
-				position:absolute;
-				left:50%;
-				top:50px;
-   			 	-ms-transform: translate(-50%,0); /* IE 9 */
-   	 			-webkit-transform: translate(-50%,0); /* Chrome, Safari, Opera */
-    			transform: translate(-50%,0);
-    			width:400px;
-    			padding-bottom:50px;
-			}
-			
-			.main > div
-			{
-				text-align:center;
-				margin-top:10px;
-			}
-			
-			
-			h1{
-				color:rgba(0,0,0,0);
-				background-image:url(../logo.png);
-				background-position:center;
-				background-size:contain;
-				background-repeat:no-repeat;
-				height:80px;
-				margin:0px;
-				margin-bottom:10px;
-			}
-			
-			.explanation
-			{
-				font-weight:bold;
-			}
-			
-			a {text-decoration:none}
-
-			
-</style>
-<?php
-
-	
-		})
-	));
+    $styleTag = new HTMLElement(
+                                array(
+                                      "tag"=>"link",
+                                      "params"=>array(
+                                                      "rel"=>"stylesheet",
+                                                      "type"=>"text/css",
+                                                      "href"=>"../estilo/style.php"
+                                                      )
+                                      )
+                                );
 	
 	//Classic elements
 	$document = new HTMLElement();
@@ -135,7 +61,7 @@
 	
 	$mainDiv = new HTMLElement(array(
 		"tag"=>"div",
-		"params"=>array("class"=>"main"),
+		"params"=>array("class"=>"main main-not-centered"),
 	));
 	
 	$titleLink = new HTMLElement(array(
@@ -145,7 +71,7 @@
 	
 	$titleDiv = new HTMLElement(array(
 		"tag"=>"h1",
-		"inside"=>"Hologramia"
+		"inside"=>"Hologramia", "params"=>array("class"=>"centered-header")
 	));
 	
 	$titleLink->addChildElement($titleDiv);

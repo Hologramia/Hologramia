@@ -25,83 +25,115 @@
 	//Dictionary of hash=>array("key"=>key,"param"=>string_param)
 	$action_dict = Helper::getSessionValue("actions",array());
 	
-	$action_functions = array(
+	$action_functions =
+    array(
 		"add-product-to-cart" => (function($product_id){
-			//echo "f1";
-			//exit;
-			$cart_products = Helper::getSessionValue("cart",array());
-			$index = -1;
-			foreach($cart_products as $i=>$value){
-				if ($value["product_id"]===$product_id){
-					$index = $i;
+			if (($cart_id = Helper::getSessionValue("cart",FALSE)) === FALSE){
+				$user = Holo::currentUser();
+				if ($user===FALSE){
+					$cart_id = DB::insertCart(0);
+				}else{
+					$cart_id = DB::insertCart($user["id"]);
+				}
+				if ($cart_id !== FALSE){
+					$_SESSION["cart"]=$cart_id;
 				}
 			}
-			if ($index==-1){
-				$cart_products[] = array("product_id"=>$product_id,"count"=>1);
+			//DO NOT JOIN THESE IFS AS IF-ELSE!
+			if ($cart_id !== FALSE){
+				if(($cart = DB::getCartById($cart_id)) !== FALSE){
+					$cart_products = Holo::getCartProducts($cart["content"]);
+					
+					$index = -1;
+					foreach($cart_products as $i=>$value){
+						if ($value["product_id"]===$product_id){
+							$index = $i;
+						}
+					}
+					if ($index==-1){
+						if (Holo::reserveProduct($product_id)){
+							$cart_products[] = array("product_id"=>$product_id,"count"=>1);
+							Holo::updateCart($cart_id,$cart_products);
+						}
+						
+					}
+					
+				}
 			}
-			$_SESSION["cart"] = $cart_products;
-			unset($_SESSION["shipping-price"]);
 		}),
 		"remove-product-from-cart" => (function($product_id){
-			//echo "f2";
-			//exit;
-			$cart_products = Helper::getSessionValue("cart",array());
-			$index = -1;
-			foreach($cart_products as $i=>$value){
-				if ($value["product_id"]===$product_id){
-					$index = $i;
+			if(($cart = Holo::getCurrentCart()) !== FALSE){
+				$cart_products = Holo::getCartProducts($cart["content"]);
+				$index = -1;
+				foreach($cart_products as $i=>$value){
+					if ($value["product_id"]===$product_id){
+						$index = $i;
+					}
 				}
+				if ($index!=-1){
+					Holo::releaseProduct($product_id,$cart_products[$index]["count"]);
+					array_splice($cart_products, $index, 1);
+					if ($cart_products){
+						
+					}
+					Holo::updateCart($cart["id"],$cart_products);
+				}
+					
 			}
-			if ($index!=-1){
-				array_splice($cart_products, $index, 1);
-			}
-			$_SESSION["cart"] = $cart_products;
-			Holo::unsetShippingPrice();
 		}),
 		"decrement-product-in-cart" => (function($product_id){
-			//echo "f2";
-			//exit;
-			$cart_products = Helper::getSessionValue("cart",array());
-			$product = FALSE;
-			$index = -1;
-			foreach($cart_products as $i=>$value){
-				if ($value["product_id"]===$product_id){
-					$product = $value;
-					$index = $i;
+			if(($cart = Holo::getCurrentCart()) !== FALSE){
+				$cart_products = Holo::getCartProducts($cart["content"]);
+				$index = -1;
+				$product = FALSE;
+				foreach($cart_products as $i=>$value){
+					if ($value["product_id"]===$product_id){
+						$product = $value;
+						$index = $i;
+					}
 				}
-			}
-			if ($index != -1 && $product){
-				if ($product["count"]<=1){
-					array_splice($cart_products, $index, 1);
-				}else{
-					$product["count"] -= 1;
-					$cart_products[$index] = $product;
+				if ($index!=-1 && $product !== FALSE){
+					if ($product["count"]<=1){
+						Holo::releaseProduct($product_id,$cart_products[$index]["count"]);
+						array_splice($cart_products, $index, 1);
+						Holo::updateCart($cart_id,$cart_products);
+					}else{
+						Holo::releaseProduct($product_id,1);
+						$product["count"] -= 1;
+						$cart_products[$index] = $product;
+						Holo::updateCart($cart["id"],$cart_products);
+					}
 				}
+					
 			}
-			$_SESSION["cart"] = $cart_products;
-			Holo::unsetShippingPrice();
 		}),
 		"increment-product-in-cart" => (function($product_id){
-			//echo "f2";
-			//exit;
-			$cart_products = Helper::getSessionValue("cart",array());
-			$product = FALSE;
-			$index = -1;
-			foreach($cart_products as $i=>$value){
-				if ($value["product_id"]===$product_id){
-					$product = $value;
-					$index = $i;
+			if(($cart = Holo::getCurrentCart()) !== FALSE){
+				$cart_products = Holo::getCartProducts($cart["content"]);
+				$index = -1;
+				$product = FALSE;
+				foreach($cart_products as $i=>$value){
+					if ($value["product_id"]===$product_id){
+						$product = $value;
+						$index = $i;
+					}
 				}
+				if ($index!=-1 && $product !== FALSE){
+					if (Holo::reserveProduct($product_id)){
+						$product["count"] += 1;
+						$cart_products[$index] = $product;
+						Holo::updateCart($cart["id"],$cart_products);
+					}
+				}
+				
 			}
-			if ($index != -1 && $product){
-				$product["count"] += 1;
-				$cart_products[$index] = $product;
-			}
-			$_SESSION["cart"] = $cart_products;
-			Holo::unsetShippingPrice();
 		}),
+		
 		"calculate-shipping" => (function(){
 			global $action_dict, $local_data;
+			if (($cart=Holo::getCurrentCart())===FALSE){
+				return;
+			}
 			if (($user = Holo::currentUser()) !== FALSE){
 				if (($shippingArea = Holo::currentShippingArea()) !== FALSE){
 					Holo::computeShippingPrice();
@@ -123,6 +155,9 @@
 			}
 		}),
 		"check-out" => (function(){
+			if (($cart=Holo::getCurrentCart())===FALSE){
+				return;
+			}
 			global $action_dict, $local_data;
 			if (($user = Holo::currentUser()) !== FALSE){
 				if (($shippingArea = Holo::currentShippingArea()) !== FALSE){
@@ -157,11 +192,11 @@
 		$currentActionKeyArray = explode(",",$currentActionKeyArray);
 		foreach ($currentActionKeyArray as $currentActionKey){
 			if ($actionArray = Helper::getArrayValue($action_dict,$currentActionKey,FALSE)){
-				if ($function = Helper::getArrayValue($action_functions,$actionArray["key"],FALSE)){
+				unset($action_dict[$currentActionKey]);
+				if (($function = Helper::getArrayValue($action_functions,$actionArray["key"],FALSE)) !== FALSE){
 					//echo "running:".$actionArray["key"];
 					$function($actionArray["param"]);
 				}
-				unset($action_dict[$currentActionKey]);
 			}
 		}
 		$_SESSION["actions"] = $action_dict;
@@ -246,469 +281,16 @@
 	}
 	*/
 	//Stylesheet
-	$styleTag = new HTMLElement(array(
-		"insideFunction" => (function(){
-
-$search_bar_height = 35;
-$search_bar_width = 300;
-$search_button_width = 60;
-$search_bar_button_padding = 0;
-
-$search_corner_radius = 4;
-
-$almost_white_color = "#fdfdfd";
-$very_light_gray_color = "rgb(243,243,243)";
-$very_light_gray_trans_color = "rgba(243,243,243,0.7)";
-
-$light_gray_color = "#cccccc";
-
-$medium_gray_color = "#aaaaaa";
-
-$selected_checkbox_color = "#44cc66";
-
-$product_padding = 30;
-$top_product_padding = 30;
-
-$top_bar_height = 80;
-$top_bar_bottom_margin = 10;
-$filters_width = 170;
-$cart_width = 250;
-
-$logo_width = 200;
-
-
-
-?>
-<style type="text/css">
-
-			body{
-				font-family:'HelveticaNeue-Light';
-				margin:0px;
-				padding:0px;
-				border:0px;
-				background-color:<?php print($very_light_gray_color); ?>;
-			}
-			
-			#content-body{
-			}
-
-			h1{
-				display:inline-block;
-				border:0px;
-				padding:0px;
-				margin:0px;
-				margin-right:10px;
-				font-weight:normal;
-				color:rgba(0,0,0,0);
-				background-image:url(logo.png);
-				background-position:center;
-				background-size:contain;
-				background-repeat:no-repeat;
-				height:<?php print($top_bar_height); ?>px;
-				width:<?php print($logo_width); ?>px;
-				vertical-align:middle;
-			}
-			
-			h2{
-				padding:0px;
-				margin:0px;
-				font-weight:normal;
-				text-align:center;
-			}
-			
-			h3{
-				font-weight:normal;
-				text-align:center;
-				margin:0px;
-				padding:0px;
-			}
-			
-			h4{
-				font-weight:normal;
-				text-align:center;
-				margin-top:5px;
-				margin-bottom:5px;
-			}
-			
-			#top-banner{
-				position:fixed;
-				padding:0px;
-				top:0px;
-				left:0px;
-				right:0px;
-				height:<?php print($top_bar_height); ?>px;
-				background-color:<?php print($very_light_gray_color); ?>;
-				z-index:50;
-				box-shadow: 0px 3px 3px <?php print($very_light_gray_color); ?>;
-				-webkit-box-shadow: 0px 3px 3px <?php print($very_light_gray_color); ?>;
-				-moz-box-shadow: 0px 3px 3px <?php print($very_light_gray_color); ?>;
-			}
-			
-			#top-right-bar{
-				position:fixed;
-				top:10px;
-				right:10px;
-				padding:10px;
-				z-index:1000;
-				font-family:"HelveticaNeue-Medium"
-			}
-			
-			a{
-				text-decoration:none;
-			}
-			
-			a:link{color:rgba(50,70,200,1)}
-			a:active{color:rgba(50,70,200,1)}
-			a:visited{color:rgba(50,70,200,1)}
-			a:hover{color:rgba(50,70,200,1)}
-			
-			form{display:inline;margin:0px;padding:0px;border:0px;}
-			
-			#search-box-container
-			{
-				/*background-color:blue;*/
-				position:relative;
-				display:inline-block;
-				vertical-align:middle;
-				height:<?php print($search_bar_height); ?>px;
-				width:<?php print($search_bar_width+$search_button_width+$search_bar_button_padding); ?>px;
-			}
-			
-			#search-box-container>input[type=text]{
-				position:absolute;
-				top:0px;
-				left:0px;
-				height:<?php print($search_bar_height); ?>px;
-				padding:0px; margin:0px;
-				border-style:solid;border-color:<?php print($light_gray_color); ?>;border-width:1px;
-				width:<?php print($search_bar_width); ?>px;
-				font-size:15px;
-				display:inline-block;
-				z-index:100;
-				border-top-left-radius:<?php print($search_corner_radius); ?>px;
-				border-bottom-left-radius:<?php print($search_corner_radius); ?>px;
-			}
-			#search-box-container>input[type=submit]{
-				position:absolute;
-				top:0px;
-				right:0px;
-				height:<?php print($search_bar_height+2); ?>px;
-				padding:0px;
-				width:<?php print($search_button_width); ?>px;
-				margin:0px;
-				border-style:solid;border-color:<?php print($light_gray_color); ?>;border-width:1px;
-				background-color:<?php print($light_gray_color); ?>;
-				background-image:url(magnifying.png);
-				background-position:center;
-				background-repeat:no-repeat;
-				background-size: auto 70%;
-				display:inline-block;
-				cursor:pointer;
-				border-top-right-radius:<?php print($search_corner_radius); ?>px;
-				border-bottom-right-radius:<?php print($search_corner_radius); ?>px;
-			}
-			
-			#filters, #right-column
-			{
-				border-style:solid;
-				border-width:0px;
-				border-radius:0px;
-			}
-			
-			#filters h3, #right-column h3{
-				color:#555;
-				padding:3px;
-			}
-			
-			#filters{
-				position:absolute;
-				left:0px;
-				top:<?php print($top_bar_height+$top_bar_bottom_margin); ?>px;
-				width:<?php print($filters_width); ?>px;
-				margin-right:<?php print($product_padding/2); ?>px;
-			}
-			
-			
-			#right-column{
-				position:absolute;
-				right:0px;
-				top:<?php print($top_bar_height+$top_bar_bottom_margin); ?>px;
-				width:<?php print($cart_width); ?>px;
-				margin-left:<?php print($product_padding/2); ?>px;
-			}
-			
-			#right-column>div{
-				border-style:solid;
-				border-width:0px;
-				border-color:rgb(230,230,230);
-				border-radius:6px;
-				position:relative;
-				margin-top:10px;
-				background-color:<?php print($medium_gray_color); ?>;
-				background-color:white;
-				padding:10px;
-			}
-			
-			#filters h2{display:none;}
-			
-			.category-set{
-				padding-top:7px;
-				padding-bottom:7px;
-				background-color:<?php print($almost_white_color); ?>;
-				/*box-shadow: inset 0px 2px 2px #eaeaea;
-				-webkit-box-shadow: inset 0px 2px 2px #eaeaea;
-				-moz-box-shadow: inset 0px 2px 2px #eaeaea;*/
-				border-radius:5px;
-			}
-			
-			#product-list{
-				position:absolute;
-				left:<?php print($filters_width); ?>px;
-				right:<?php print($cart_width); ?>px;
-				top:<?php print($top_bar_height+$top_bar_bottom_margin); ?>px;
-				min-height:500px;
-				text-align:center;
-				padding-bottom:20px;
-			}
-			
-			#product-list>div{
-				position:relative;
-				display:inline-block;
-				border-style:solid;
-				border-width:0px;
-				border-color:light-gray;
-				background-color:white;
-				padding:5px;
-				border-radius:5px;
-				width:165px;
-				height:270px;
-				margin:<?php print($product_padding/2); ?>px;
-				margin-top:<?php print($top_product_padding); ?>px;
-				margin-bottom:<?php print($top_product_padding-$product_padding); ?>px;
-				vertical-align:middle;
-				overflow:hidden;
-				box-shadow: 0px 2px 2px #ddd;
-				-webkit-box-shadow: 0px 2px 2px #ddd;
-				-moz-box-shadow: 0px 2px 2px #ddd;
-			}
-			
-			.product-name{
-				text-align:center;
-				padding-top:20px;
-				padding-bottom:20px;
-				overflow:hidden;
-			}
-			
-			.product-price{
-				text-align:left;
-				position:absolute;
-				left:0px;
-				bottom:0px;
-				background:white;
-				width:100%;
-				box-shadow: 0px -10px 10px #fff;
-				-webkitbox-shadow: 0px -10px 10px #fff;
-				-moz-box-shadow: 0px -10px 10px #fff;
-			}
-			
-			.cart-link,.cart-link-no{
-				z-index:40;
-				position:absolute;
-				right:5px;
-				bottom:0px;
-				height:30px;
-				width:30px;
-				background-image:url(cart.png);
-				background-position:center;
-				background-repeat:no-repeat;
-				background-size:auto 100%;
-			}
-			
-			.cart-link-no{
-				pointer-events:none;
-				opacity:0.3;
-			}
-			
-			.product-thumb{
-				display:block;
-				height:130px;
-				background-size: auto 100%;
-				background-repeat: no-repeat;
-				background-position:center;
-				margin-top:10px;
-			}
-			
-			.category-box {
-				padding:3px;
-				padding-left:10px;
-				border-style:solid;
-				border-width:0px;
-				border-color:rgb(230,230,230);
-				position:relative;
-			}
-			
-			.category-title {
-				color:#999999;
-			}
-			
-			.category-title + a, .category-title + a + a {
-				border-style:solid;
-				border-width:1px;
-				border-color:#dddddd;
-				background-color:#dddddd;
-				position:absolute;
-				top:2px;
-				right:10px;
-				bottom:2px;
-				width:18px;
-				border-radius:5px;
-			}
-			
-			/*a:empty, click to select a+a:selected, click to unselect*/
-			.category-title + a{
-				display:block;
-				text-decoration:none;
-				color:white;
-				font-weight:bold;
-			}
-		
-			.category-title + a + a {
-				display:none;
-				text-decoration:none;
-				color:white;
-				font-weight:bold;
-			}
-			
-			.category-title[data-selected]{
-				color:#000000;
-			}
-			
-			.category-title[data-selected] + a{
-				display:none;
-			}
-			
-			.category-title[data-selected] + a + a{
-				display:block;
-				background-color:<?php print($selected_checkbox_color) ?>;
-				border-color:<?php print($selected_checkbox_color) ?>;
-				background-image:url(checkmark.png);
-				background-size:auto 90%;
-				background-repeat:no-repeat;
-				background-position:center;
-			}
-			
-			.cart-product-name{
-				width:70%;
-				min-height:50px;
-				margin-bottom:5px;
-			}
-			
-			.remove-cart-link{
-				position:absolute;
-				top:5px;
-				right:5px;
-				width:20px;
-				height:20px;
-				border-style:solid;
-				border-width:0px;
-				border-color:<?php print($medium_gray_color); ?>;
-				border-radius:11px;
-				background-image:url(redx.png);
-				background-position:center;
-				background-size:100% auto;
-				background-repeat:no-repeat;
-				background-color:white;
-				
-			}
-			
-			.cart-price{
-				text-align:right;
-				position:absolute;
-				bottom:10px;
-				right:10px;
-			}
-			
-			.cart-calculation{
-				color:<?php print($light_gray_color); ?>;
-			}
-			
-			.increment-link, .decrement-link {
-				display:inline-block;
-				width:16px;
-				height:16px;
-				background-position:center;
-				background-repeat:no-repeat;
-				background-size:90% auto;
-				vertical-align:middle;
-				border-radius:5px;
-				background-color:black;
-			}
-			
-			.increment-link{
-				margin-left:5px;
-				background-image:url(plus.png)
-			}
-			
-			.decrement-link {
-				margin-left:5px;
-				background-image:url(minus.png)
-			}
-			
-			.carrito{
-				display:inline-block;
-				width:35px;
-				height:35px;
-				background-image:url(cart.png);
-				background-position:center;
-				background-size:100% auto;
-				background-repeat:no-repeat;
-				vertical-align:middle;
-				margin-top:-7px;
-				margin-right:5px;
-			}
-			
-			.cart-total-container{
-				overflow:auto;
-			}
-			
-			.cart-subtotal-text{
-				clear:both;
-				float:left;
-			}
-			
-			.cart-subtotal-value{
-				clear:right;
-				float:right;
-			}
-			
-			.cart-buttons-wrapper{
-				clear:both;
-				position:relative;
-				padding-top:10px;
-			}
-			
-			.shipping-link{
-				display:block;
-				clear:both;
-				text-decoration:none;
-				color:white;
-				background-color:<?php print($medium_gray_color) ?>;
-				padding-top:10px;
-				padding-bottom:10px;
-				border-radius:6px;
-				text-align:center;
-			}
-			
-			.checkout-link{
-				background-color:rgb(50,200,50);
-			}
-			
-</style>
-<?php
-
-	
-		})
-	));
+    $styleTag = new HTMLElement(
+                                array(
+                                      "tag"=>"link",
+                                      "params"=>array(
+                                                      "rel"=>"stylesheet",
+                                                      "type"=>"text/css",
+                                                      "href"=>"estilo/style.php"
+                                                      )
+                                      )
+                                );
 	
 	//Classic elements
 	$document = new HTMLElement();
@@ -732,12 +314,14 @@ $logo_width = 200;
 // 		"params"=>array("href"=>$dir)
 // 	)));
 	
+    
+    
 	
 	//Search bar
 	$searchBar = new HTMLElement();
 	$searchForm = new HTMLElement(array(
 		"tag"=>"form",
-		"params"=>array("action"=>"","method"=>"get","id"=>"search-form")
+		"params"=>array("action"=>"","method"=>"get","class"=>"search-form")
 	));
 	$searchBar->addChildElement($searchForm);
 	$searchTextBoxContainer = new HTMLElement(array(
@@ -764,7 +348,7 @@ $logo_width = 200;
 		"params"=>array("id"=>"top-banner"),
 		"childElements"=>array(new HTMLElement(array(
 			"tag"=>"h1",
-			"inside"=>"Hologramia"
+			"inside"=>"Hologramia", "params"=>array("class"=>"main-header")
 		)),$searchBar)
 	));
 	
@@ -778,7 +362,7 @@ $logo_width = 200;
 	
 	$filterTitle = new HTMLElement(array(
 		"tag"=>"h2",
-		"inside"=>"Filtros"
+		"inside"=>"Filtros", "params"=>array("class"=>"sides-header")
 	));
 	
 	$searchFilters->addChildElement($filterTitle);
@@ -946,7 +530,9 @@ $logo_width = 200;
 // 			"param"=>array("class"=>"product-description")
 // 		));
 		$productElement->addChildElement(array($productThumbnail,$productName,$productPrice));
-		if (Helper::array_path_exists(array("cart",NULL,"product_id",$product["id"]),$_SESSION)){
+		
+		
+		if (Holo::isProductInCart($product["id"])){
 			$urlString = "";
 			$addClass = "cart-link-no";
 		}else{
@@ -971,13 +557,13 @@ $logo_width = 200;
 	));
 	
 	$cartTitle = new HTMLElement(array(
-		"tag"=>"h2",
+		"tag"=>"h2", "params"=>array("class"=>"sides-header"),
 		"inside"=>"<div class='carrito'></div>Carrito"
 	));
 	
 	$rightColumn->addChildElement($cartTitle);
 	
-	if ($cartItems = Helper::getSessionValue("cart",FALSE)){
+	if (($cartItems = Holo::getCurrentCartProducts()) !== FALSE && count($cartItems)>0){
 		$totalPrice = 0;
 		foreach($cartItems as $item){
 			if ($product = DB::getProductById($item["product_id"])){

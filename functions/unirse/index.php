@@ -54,136 +54,16 @@
 		
 	}
 	
-	$styleTag = new HTMLElement(array(
-		"insideFunction" => (function(){
-		
-		$search_bar_height = 35;
-		$search_bar_width = 300;
-		$search_button_width = 60;
-		$search_bar_button_padding = 0;
-
-		$search_corner_radius = 4;
-
-		$almost_white_color = "#fdfdfd";
-		$very_light_gray_color = "rgb(243,243,243)";
-		$very_light_gray_trans_color = "rgba(243,243,243,0.7)";
-
-		$light_gray_color = "#cccccc";
-
-		$medium_gray_color = "#aaaaaa";
-
-		$selected_checkbox_color = "#44cc66";
-
-		$product_padding = 30;
-		$top_product_padding = 30;
-
-		$top_bar_height = 80;
-		$top_bar_bottom_margin = 10;
-		$filters_width = 170;
-		$cart_width = 250;
-
-		$logo_width = 200;
-
-?>
-<style type="text/css">
-
-			body{
-				font-family:'HelveticaNeue-Light';
-				margin:0px;
-				padding:0px;
-				border:0px;
-				background-color:<?php print($very_light_gray_color); ?>;
-			}
-			
-			.main{
-				position:absolute;
-				left:50%;
-				top:50%;
-   			 	-ms-transform: translate(-50%,-50%); /* IE 9 */
-   	 			-webkit-transform: translate(-50%,-50%); /* Chrome, Safari, Opera */
-    			transform: translate(-50%,-50%);
-    			width:300px;
-			}
-			
-			.main > div
-			{
-				text-align:center;
-				font-weight:bold;
-			}
-			
-			form
-			{
-				display:block;
-				margin:0px;
-				padding:0px;
-				text-align:center;
-			}
-			
-			form input[type='text'], form input[type='password']
-			{
-				display:block;
-				margin:0px;
-				padding:0px;
-				width:100%;
-				margin-top:10px;
-				height:35px;
-				font-size:14pt;
-				border-style:solid;
-				border-width:1px;
-				border-color:<?php print($light_gray_color); ?>;
-				border-radius:6px;
-			}
-			
-			form input[type='submit']
-			{
-				display:block;
-				margin:0px;
-				padding:0px;
-				width:100%;
-				margin-top:10px;
-				height:35px;
-				border-style:solid;
-				border-width:0px;
-				border-radius:6px;
-				font-size:18px;
-				color:white;
-				background-color:rgb(100,190,100);
-				cursor:pointer;
-			}
-			
-			.error-message
-			{
-				color:red;
-				margin-top:10px;
-				text-align:center;
-			}
-			
-			.normal-text
-			{
-				margin-top:10px;
-				text-align:center;
-			}
-			
-			h1{
-				color:rgba(0,0,0,0);
-				background-image:url(../logo.png);
-				background-position:center;
-				background-size:contain;
-				background-repeat:no-repeat;
-				height:80px;
-				margin:0px;
-				margin-bottom:10px;
-			}
-			
-			a {text-decoration:none}
-
-			
-</style>
-<?php
-
-	
-		})
-	));
+    $styleTag = new HTMLElement(
+                                array(
+                                      "tag"=>"link",
+                                      "params"=>array(
+                                                      "rel"=>"stylesheet",
+                                                      "type"=>"text/css",
+                                                      "href"=>"../estilo/style.php"
+                                                      )
+                                      )
+                                );
 	
 	//Classic elements
 	$document = new HTMLElement();
@@ -207,7 +87,7 @@
 	
 	$mainDiv = new HTMLElement(array(
 		"tag"=>"div",
-		"params"=>array("class"=>"main"),
+		"params"=>array("class"=>"main join-main"),
 	));
 	
 	$titleLink = new HTMLElement(array(
@@ -217,7 +97,7 @@
 	
 	$titleDiv = new HTMLElement(array(
 		"tag"=>"h1",
-		"inside"=>"Hologramia"
+		"inside"=>"Hologramia", "params"=>array("class"=>"centered-header")
 	));
 	
 	$titleLink->addChildElement($titleDiv);
@@ -247,7 +127,7 @@
 	
 	$form = new HTMLElement(array(
 		"tag"=>"form",
-		"params"=>array("action"=>"","method"=>"post")
+		"params"=>array("action"=>"","method"=>"post","class"=>"log-in-form")
 	));
 	
 	$nameInput = new HTMLElement(array(

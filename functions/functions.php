@@ -5,22 +5,145 @@ require_once("con.php");
 
 class Holo {
 
+	public static function getCurrentCart()
+		{
+			if (($cart_id=Helper::getSessionValue("cart",FALSE)) !== FALSE){
+				if (($cart=DB::getCartById($cart_id)) !== FALSE){
+					return $cart;
+				}else{
+					unset($_SESSION["cart"]);
+					return FALSE;
+				}
+			}else{
+				return FALSE;
+			}
+		}
+		
+	public static function updateCartUserId($cart_id,$user_id)
+	{
+		DB::updateValues("cart",array("user_id"=>$user_id),"id=?",array($cart_id));
+		Holo::updateCartTime($cart_id);
+	}	
+	public static function updateCartTime($cart_id)
+		{
+			return DB::updateValues("cart",array(),"id=?",array($cart_id),array("time"=>"NOW()"));
+		}
+	
+	public static function reserveProduct($product_id)
+		{
+			if (($product = DB::getProductById($product_id)) !== FALSE){
+				$stock = $product["stock"];
+				$reserved = $product["reserved"];
+				$bought = $product["bought"];
+				if ($stock-$reserved-$bought<=0){
+					return FALSE;
+				}else{
+					$reserved += 1;
+					return DB::updateValues("product",array("reserved"=>$reserved),"id=?",array($product_id));
+				}
+			}else{
+				return FALSE;
+			}
+		}
+	public static function releaseProduct($product_id,$count)
+		{
+			if (($product = DB::getProductById($product_id)) !== FALSE){
+				$reserved = $product["reserved"];
+				$reserved -= $count;
+				if ($reserved<0){
+					$reserved = 0;
+				}
+				return DB::updateValues("product",array("reserved"=>$reserved),"id=?",array($product_id));
+			}else{
+				return FALSE;
+			}
+		}
+	
+		public static function isProductInCart($product_id)
+		{
+			if (($products=Holo::getCurrentCartProducts()) !== FALSE){
+				foreach ($products as $value) {
+					if ($value["product_id"]===$product_id){
+						return TRUE;
+					}
+				}
+				return FALSE;
+			}else{
+				return FALSE;
+			}
+			
+		}
+		
+	public static function getCurrentCartProducts()
+		{
+			if (($cart=Holo::getCurrentCart()) !== FALSE){
+				return Holo::getCartProducts($cart["content"]);
+			}else{
+				return FALSE;
+			}
+		}
+		
+	public static function getCartProducts($content)
+	{
+		$products = array();
+		$itemArray = explode(";",$content);
+		foreach ($itemArray as $value){
+			$values = explode("|",$value);
+			if (count($values)==2){
+				$products[] = array("product_id"=>$values[0]+0,"count"=>$values[1]+0);
+			}
+		}
+		return $products;
+	}
+	
+	public static function getCartContent($products){
+		$count = 0;
+		$content = "";
+		foreach ($products as $value){
+			if ($count>0){
+				$content .= ";";
+			}
+			$content .= $value["product_id"]."|".$value["count"];
+			$count+=1;
+		}
+		return $content;
+	}
+	
+	public static function updateCart($cart_id,$cart_products)
+	{
+		if (count($cart_products)==0){
+			DB::removeCartWithId($cart_id);
+			if (Helper::getSessionValue("cart",FALSE)===$cart_id){
+				unset($_SESSION["cart"]);
+			}
+			return;
+		}
+		
+		$content = Holo::getCartContent($cart_products);
+		DB::updateValues("cart",array("content"=>$content,"shipping_done"=>0),"id=?",array($cart_id));
+		Holo::updateCartTime($cart_id);
+	}
+	
 	public static function logOut()
 	{
 		unset($_SESSION["user"]);
 		unset($_SESSION["cart"]);
 		unset($_SESSION["shipping-area"]);
-		unset($_SESSION["shipping-price"]);
+		//unset($_SESSION["shipping-price"]);
 	}
-
-	public static function unsetShippingPrice()
-	{
-		unset($_SESSION["shipping-price"]);
-	}
-
+	
 	public static function computeShippingPrice()
 	{
-		$_SESSION["shipping-price"] = 50;
+		//Use shipping area!
+		
+		if (($cart=Holo::getCurrentCart()) !== FALSE){
+			updateCartTime($cart["id"]);
+			return DB::updateValues("cart",array("shipping_price"=>50,"shipping_done"=>1),"id=?",array($cart["id"]),array("time"=>"NOW()"));
+		}else{
+			return FALSE;
+		}
+		
+		//$_SESSION["shipping-price"] = 50;
 	}
 
 	public static function updateShippingArea($area)
@@ -82,6 +205,10 @@ class Holo {
 		
 		$_SESSION["user"] = $user;
 		
+		if (($cart = Holo::getCurrentCart()) !== FALSE){
+			Holo::updateCartUserId($cart["id"],$user["id"]);
+		}
+		
 		return TRUE;
 	}
 
@@ -110,8 +237,14 @@ class Holo {
 	
 	public static function currentShippingPrice()
 	{
-		if (array_key_exists("shipping-price",$_SESSION)){
-			return $_SESSION["shipping-price"];
+		
+		if (($cart=Holo::getCurrentCart()) !== FALSE){
+			
+			if ($cart["shipping_done"]>0){
+				return $cart["shipping_price"];
+			}else{
+				return FALSE;
+			}
 		}else{
 			return FALSE;
 		}
@@ -558,6 +691,14 @@ class DB{
 		return $result;
 	}
 
+	public static function insertCart($user_id)
+	{
+		
+		$insert_id = DB::insertValues("cart",array("user_id"=>$user_id));
+		Holo::updateCartTime($insert_id);
+		return $insert_id;		
+	}
+	
 	public static function insertProduct($name, $description, $price, $thumb)
 	{
 		$insert_id = DB::insertValues("product",array("name"=>$name,"description"=>$description,"price"=>$price,"thumb"=>$thumb));
@@ -594,6 +735,11 @@ class DB{
 	public static function getUserById($id)
 	{
 		return DB::getUniqueValue("user",array(),"id=?",array($id));
+	}
+	
+	public static function getCartById($id)
+	{
+		return DB::getUniqueValue("cart",array(),"id=?",array($id));
 	}
 
 	public static function getUserByIdentifier($identifier)
@@ -656,6 +802,11 @@ class DB{
 	public static function removeUserWithId($id)
 	{
 		return DB::removeValues("user","id=?",array($id));
+	}
+	
+	public static function removeCartWithId($id)
+	{
+		return DB::removeValues("cart","id=?",array($id));
 	}
 
 	public static function removeCategoryWithId($id)
@@ -914,7 +1065,7 @@ class DB{
 
 	
 	
-	public static function updateValues($tableName,$valueArray,$whereStatement,$whereValues){
+public static function updateValues($tableName,$valueArray,$whereStatement,$whereValues,$extraUpdates=FALSE){
 	
 		$types = "";
 		$keys = array_keys($valueArray);
@@ -944,6 +1095,19 @@ class DB{
 					$types = $types."s";
 			}
 			
+		}
+		
+		if ($extraUpdates !== FALSE){
+			$numExtra = count($extraUpdates);
+			$i = 0;
+			foreach ($extraUpdates as $key=>$value){
+				if ($i+$numKeys==0){
+					$questionMarks = "SET ".$key."=".$value;
+				}else{
+					$questionMarks .= ", ".$key."=".$value;
+				}
+				$i+=1;
+			}
 		}
 		
 		$refWhereValues = array();

@@ -14,7 +14,7 @@
 	
 	Helper::loadArrayIfNULL($local_data,$_GET);
 	
-	if (($cart = Helper::getSessionValue("cart",FALSE)) === FALSE || count($cart)<1){
+	if (($cart = Holo::getCurrentCartProducts()) === FALSE || count($cart)<1){
 		header("Location: ../");
 		exit;
 	}elseif (($user = Holo::currentUser()) !== FALSE && ($shippingArea = Holo::currentShippingArea()) !== FALSE){
@@ -25,137 +25,16 @@
 		exit;
 	}
 	
-	$styleTag = new HTMLElement(array(
-		"insideFunction" => (function(){
-		
-		$search_bar_height = 35;
-		$search_bar_width = 300;
-		$search_button_width = 60;
-		$search_bar_button_padding = 0;
-
-		$search_corner_radius = 4;
-
-		$almost_white_color = "#fdfdfd";
-		$very_light_gray_color = "rgb(243,243,243)";
-		$very_light_gray_trans_color = "rgba(243,243,243,0.7)";
-
-		$light_gray_color = "#cccccc";
-
-		$medium_gray_color = "#aaaaaa";
-
-		$selected_checkbox_color = "#44cc66";
-
-		$product_padding = 30;
-		$top_product_padding = 30;
-
-		$top_bar_height = 80;
-		$top_bar_bottom_margin = 10;
-		$filters_width = 170;
-		$cart_width = 250;
-
-		$logo_width = 200;
-
-?>
-<style type="text/css">
-
-			body{
-				font-family:'HelveticaNeue-Light';
-				margin:0px;
-				padding:0px;
-				border:0px;
-				background-color:<?php print($very_light_gray_color); ?>;
-			}
-			
-			.main{
-				position:absolute;
-				left:50%;
-				top:50px;
-   			 	-ms-transform: translate(-50%,0); /* IE 9 */
-   	 			-webkit-transform: translate(-50%,0); /* Chrome, Safari, Opera */
-    			transform: translate(-50%,0);
-    			width:400px;
-    			padding-bottom:50px;
-			}
-			
-			.main > div
-			{
-				text-align:center;
-				margin-top:10px;
-			}
-			
-			
-			h1{
-				color:rgba(0,0,0,0);
-				background-image:url(../logo.png);
-				background-position:center;
-				background-size:contain;
-				background-repeat:no-repeat;
-				height:80px;
-				margin:0px;
-				margin-bottom:10px;
-			}
-			
-			h2{font-weight:normal;text-align:center}
-			
-			a {text-decoration:none}
-			
-			#main-div>div{
-				border-style:solid;
-				border-width:0px;
-				border-color:rgb(230,230,230);
-				border-radius:6px;
-				position:relative;
-				margin-top:10px;
-				background-color:<?php print($medium_gray_color); ?>;
-				background-color:white;
-				padding:10px;
-			}
-			
-			.cart-price{
-				text-align:right;
-				position:absolute;
-				bottom:10px;
-				right:10px;
-			}
-			
-			.cart-calculation{
-				color:<?php print($light_gray_color); ?>;
-			}
-			
-			.carrito{
-				display:inline-block;
-				width:35px;
-				height:35px;
-				background-image:url(../cart.png);
-				background-position:center;
-				background-size:100% auto;
-				background-repeat:no-repeat;
-				vertical-align:middle;
-				margin-top:-7px;
-				margin-right:5px;
-			}
-			
-			.cart-total-container{
-				overflow:auto;
-			}
-			
-			.cart-subtotal-text{
-				clear:both;
-				float:left;
-			}
-			
-			.cart-subtotal-value{
-				clear:right;
-				float:right;
-			}
-
-			
-</style>
-<?php
-
-	
-		})
-	));
+    $styleTag = new HTMLElement(
+                                array(
+                                      "tag"=>"link",
+                                      "params"=>array(
+                                                      "rel"=>"stylesheet",
+                                                      "type"=>"text/css",
+                                                      "href"=>"../estilo/style.php"
+                                                      )
+                                      )
+                                );
 	
 	//Classic elements
 	$document = new HTMLElement();
@@ -189,7 +68,7 @@
 	
 	$titleDiv = new HTMLElement(array(
 		"tag"=>"h1",
-		"inside"=>"Hologramia"
+		"inside"=>"Hologramia", "params"=>array("class"=>"centered-header")
 	));
 	
 	$titleLink->addChildElement($titleDiv);
@@ -210,7 +89,7 @@
 	
 	$mainDiv->addChildElement($cartTitle);
 	
-	if ($cartItems = Helper::getSessionValue("cart",FALSE)){
+	if ($cartItems = Holo::getCurrentCartProducts()){
 		$totalPrice = 0;
 		foreach($cartItems as $item){
 			if ($product = DB::getProductById($item["product_id"])){
